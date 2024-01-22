@@ -64,7 +64,7 @@
       version-timestamp="{{ versionTimestamp }}"
       :open="true">
       <template v-slot:title>
-        {{ $t('compare_versions') }}
+        {{$ __('compare_versions') $}}
       </template>
       <template v-slot:body>
         <div class="prose max-w-full version-comparison">
