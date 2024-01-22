@@ -241,9 +241,10 @@ class CommentariesController extends Controller
         $revisionData['id'] = $revision['attributes']['id'];
         $revisionData['slug'] = $revision['attributes']['slug'];
 
-        // convert the structured data from the 'content' field into html
+        // convert the structured data from the 'content' and 'legal_text' fields into html
         $modifiers = new CoreModifiers();
         $revisionData['content'] = $modifiers->bardHtml($revisionData['content']);
+        $revisionData['legal_text'] = $modifiers->bardHtml($revisionData['legal_text']);
 
         // add anchor attributes to the heading elements
         if ($revisionData['content']) {
@@ -253,6 +254,9 @@ class CommentariesController extends Controller
 
         // include the human-readable timestamp of the revision in the revision data
         $revisionData['human_readable_timestamp'] = $this->_getLocaleFormattedTimestamp($revision['date'], $locale);
+
+        // include the revision action as a placeholder for the status value
+        $revisionData['status'] = $revision['action'] === 'publish' ? 'published' : 'revision';
 
         return $revisionData;
     }
