@@ -2,21 +2,21 @@
 
 namespace App\Http\Controllers\Frontend;
 
-use Carbon\Carbon;
-use TOC\MarkupFixer;
-use TOC\TocGenerator;
-use Statamic\View\View;
-use Jfcherng\Diff\Differ;
-use Statamic\Facades\User;
-use Statamic\Facades\Entry;
-use Statamic\CP\LivePreview;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\File;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
-use Statamic\Modifiers\CoreModifiers;
+use Illuminate\Support\Facades\File;
+use Jfcherng\Diff\Differ;
 use Jfcherng\Diff\Factory\RendererFactory;
 use Jfcherng\Diff\Renderer\RendererConstant;
 use PragmaRX\Yaml\Package\Facade as YamlFacade;
+use Statamic\CP\LivePreview;
+use Statamic\Facades\Entry;
+use Statamic\Facades\User;
+use Statamic\Modifiers\CoreModifiers;
+use Statamic\View\View;
+use TOC\MarkupFixer;
+use TOC\TocGenerator;
 
 class CommentariesController extends Controller
 {
@@ -24,18 +24,17 @@ class CommentariesController extends Controller
     {
         $isLivePreview = request()->statamicToken();
 
-
         // Create a unique cache key based on the request parameters
-        $cacheKey = "commentary_view:{$locale}:{$commentarySlug}:{$versionTimestamp}:" . ($versionComparisonResult ? md5($versionComparisonResult) : '');
+        $cacheKey = "commentary_view:{$locale}:{$commentarySlug}:{$versionTimestamp}:".($versionComparisonResult ? md5($versionComparisonResult) : '');
 
         // Check if the view is already cached
-        if (config('app.env') !== 'local' && !$isLivePreview && Cache::has($cacheKey)) {
+        if (config('app.env') !== 'local' && ! $isLivePreview && Cache::has($cacheKey)) {
             return Cache::get($cacheKey);
         }
 
         // Handle Live Preview in CP
-        if($isLivePreview) {
-            $livePreview = new LivePreview(); 
+        if ($isLivePreview) {
+            $livePreview = new LivePreview();
             $commentaryData = $livePreview->item(app()->request->statamicToken());
             $commentaryData = $commentaryData->toArray();
         }
@@ -52,15 +51,14 @@ class CommentariesController extends Controller
 
                 // return 404 if revision file is not found
                 $commentaryRevisionBasePath = $this->_getCommentaryRevisionBasePath($locale, $commentary['id']);
-                $revisionFile = $commentaryRevisionBasePath . '/' . $versionTimestamp . '.yaml';
-                if (!File::exists($revisionFile)) {
+                $revisionFile = $commentaryRevisionBasePath.'/'.$versionTimestamp.'.yaml';
+                if (! File::exists($revisionFile)) {
                     abort(404);
                 }
 
                 // get the revision data for the given timestamp
                 $commentaryData = $this->_getRevisionDataFromRevisionFile($revisionFile, $locale);
-            }
-            else {
+            } else {
                 // get the commentary data for the given locale and slug
                 $commentaryData = Entry::query()
                     ->where('collection', 'commentaries')
@@ -68,14 +66,14 @@ class CommentariesController extends Controller
                     ->where('slug', $commentarySlug)
                     ->first();
                 // return 404 if commentary is not found
-                if (!$commentaryData) {
+                if (! $commentaryData) {
                     abort(404);
                 }
                 $commentaryData = $commentaryData->toArray();
             }
 
             // do not show unpublished commentaries to unauthenticated users on the frontend
-            if ($commentaryData['status'] !== 'published' && !User::current()) {
+            if ($commentaryData['status'] !== 'published' && ! User::current()) {
                 abort(404);
             }
         }
@@ -88,7 +86,7 @@ class CommentariesController extends Controller
         $commentaryData['additional_documents'] = $this->_getDocuments($commentaryData['additional_documents'] ?? null, ['id', 'url', 'title']);
 
         // return the first original language (default to German) since only one original language can be assigned to a commentary
-        $commentaryData['original_language'] = ($commentaryData['original_language'] && is_array($commentaryData['original_language']) && !empty($commentaryData['original_language']))
+        $commentaryData['original_language'] = ($commentaryData['original_language'] && is_array($commentaryData['original_language']) && ! empty($commentaryData['original_language']))
             ? $commentaryData['original_language'][0]
             : 'de';
 
@@ -101,14 +99,14 @@ class CommentariesController extends Controller
             $markupFixer = new MarkupFixer();
             $contentMarkup = $markupFixer->fix($content);
         }
-        
+
         // generate table of contents from the heading elements
         $toc = null;
         if ($contentMarkup) {
             $tocGenerator = new TocGenerator();
             $toc = $tocGenerator->getHtmlMenu($contentMarkup);
         }
-    
+
         // select the legal domain or show template depending on commentary content
         $template = $commentaryData['content'] ? 'commentaries/show' : 'commentaries/legal-domain';
 
@@ -122,12 +120,12 @@ class CommentariesController extends Controller
                 'toc' => $toc,
                 'versionTimestamp' => $versionTimestamp,
                 'versionComparisonResult' => $versionComparisonResult,
-                'base_path_prefix' => '/' . $locale . '/',
+                'base_path_prefix' => '/'.$locale.'/',
             ], $commentaryData))
             ->render();  // render the view to a string
 
         // Cache the generated view for 7 days
-        if (config('app.env') !== 'local' && !$isLivePreview) {
+        if (config('app.env') !== 'local' && ! $isLivePreview) {
             Cache::put($cacheKey, $view, now()->addDays(7));
         }
 
@@ -148,8 +146,8 @@ class CommentariesController extends Controller
 
         // get the html version of the 'content' field for each revision
         $commentaryRevisionBasePath = $this->_getCommentaryRevisionBasePath($locale, $commentaryId);
-        $revision1 = $this->_getRevisionContentFromRevisionFile($commentaryRevisionBasePath . '/' . $revisionTimestamp1 . '.yaml', $locale);
-        $revision2 = $this->_getRevisionContentFromRevisionFile($commentaryRevisionBasePath . '/' . $revisionTimestamp2 . '.yaml', $locale);
+        $revision1 = $this->_getRevisionContentFromRevisionFile($commentaryRevisionBasePath.'/'.$revisionTimestamp1.'.yaml', $locale);
+        $revision2 = $this->_getRevisionContentFromRevisionFile($commentaryRevisionBasePath.'/'.$revisionTimestamp2.'.yaml', $locale);
 
         // show footnotes inline before stripping tags
         $revision1['content'] = $this->_showFootnotesInline($revision1['content']);
@@ -158,16 +156,16 @@ class CommentariesController extends Controller
         /*
          * Append newlines after block element closing tags so that the revision
          * content can be diff'ed on a line-by-line basis.
-         * 
-         * Note: The list of block element closing tags are the ones that are 
+         *
+         * Note: The list of block element closing tags are the ones that are
          *       enabled in the Bard field menu. Any newly added block elements
          *       to the Bard field need to be added to this list.
          */
         $lineDelimiter = '\n';
         $blockElementClosingTags = ['</p>', '</h1>', '</h2>', '</h3>', '</h4>', '</h5>', '</h6>', '</ul>', '</ol>'];
         foreach ($blockElementClosingTags as $closingTag) {
-            $revision1['content'] = str_replace($closingTag, $closingTag . $lineDelimiter, $revision1['content']);
-            $revision2['content'] = str_replace($closingTag, $closingTag . $lineDelimiter, $revision2['content']);
+            $revision1['content'] = str_replace($closingTag, $closingTag.$lineDelimiter, $revision1['content']);
+            $revision2['content'] = str_replace($closingTag, $closingTag.$lineDelimiter, $revision2['content']);
         }
 
         // replace non-breaking spaces with regular spaces
@@ -188,11 +186,13 @@ class CommentariesController extends Controller
         return $this->show($locale, $commentarySlug, $versionTimestamp, str_replace($lineDelimiter, '<br />', $versionComparisonResult));
     }
 
-    private function _showFootnotesInline($content) {
+    private function _showFootnotesInline($content)
+    {
         $searchPattern = '/<footnote data-content=\"(.*?)\"><\/footnote>/i';
-        $content = preg_replace_callback($searchPattern, function($matches) {
-            return ' [' . strip_tags($matches[1]) . '] ';
+        $content = preg_replace_callback($searchPattern, function ($matches) {
+            return ' ['.strip_tags($matches[1]).'] ';
         }, $content);
+
         return $content;
     }
 
@@ -209,6 +209,7 @@ class CommentariesController extends Controller
                 $users[] = $fieldsToInclude ? array_intersect_key($user, array_flip($fieldsToInclude)) : $user;
             }
         }
+
         return $users;
     }
 
@@ -221,12 +222,13 @@ class CommentariesController extends Controller
 
     private function _getCommentaryRevisionBasePath($locale, $commentaryId)
     {
-        return config('statamic.revisions.path') . '/collections/commentaries/' . $locale . '/' . $commentaryId;
+        return config('statamic.revisions.path').'/collections/commentaries/'.$locale.'/'.$commentaryId;
     }
 
     private function _getLocaleFormattedTimestamp($timestamp, $locale)
     {
-        $format = ($locale === 'en' ? 'MM/DD/YYYY' : 'DD.MM.YYYY') . ' hh:mm:ss z';
+        $format = ($locale === 'en' ? 'MM/DD/YYYY' : 'DD.MM.YYYY').' hh:mm:ss z';
+
         return Carbon::createFromTimestamp($timestamp)->isoFormat($format);
     }
 
@@ -269,7 +271,7 @@ class CommentariesController extends Controller
 
         return [
             'human_readable_timestamp' => $this->_getLocaleFormattedTimestamp($revision['date'], $locale),
-            'content' => $revisionHtmlContent
+            'content' => $revisionHtmlContent,
         ];
     }
 
@@ -305,7 +307,7 @@ class CommentariesController extends Controller
             // or an array which has the same keys with a language file
             'language' => [
                 'old_version' => $revision1Timestamp,
-                'new_version' => $revision2Timestamp
+                'new_version' => $revision2Timestamp,
             ],
             // show line numbers in HTML renderers
             'lineNumbers' => false,
@@ -348,6 +350,7 @@ class CommentariesController extends Controller
 
         $differ = new Differ($revision1Content, $revision2Content, $differOptions);
         $renderer = RendererFactory::make($rendererName, $rendererOptions);
+
         return html_entity_decode($renderer->render($differ));
     }
 }

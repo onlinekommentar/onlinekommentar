@@ -122,7 +122,7 @@ return [
 
     'custom_logo_url' => [
         'nav' => '/img/ok-logo.svg',
-        'outside' => '/img/ok-logo-text.svg'
+        'outside' => '/img/ok-logo-text.svg',
     ],
 
     'custom_favicon_url' => '/img/ok-logo.svg',

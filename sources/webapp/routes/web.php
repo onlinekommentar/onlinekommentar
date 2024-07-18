@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-  return redirect('/de');
+    return redirect('/de');
 });
 
 // author and editor detail views
@@ -32,5 +32,5 @@ Route::get('{locale}/commentaries/{commentaryId}/revisions/{revisionTimestamp1}/
 Route::get('{locale}/commentaries/{commentaryId}/revisions/{revisionTimestamp1}/compare/{revisionTimestamp2}', [CommentariesController::class, 'compareRevisions']);
 
 Route::statamic('{locale}/search', 'search', [
-  'title' => 'Search Results'
+    'title' => 'Search Results',
 ]);
