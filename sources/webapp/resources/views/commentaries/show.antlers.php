@@ -27,7 +27,7 @@
         {{ /foreach:assigned_authors }}
       ],
       legal_text: '{{ legal_text | add_slashes | sanitize:true }}',
-      suggested_citation_long: '{{ suggested_citation_long | add_slashes | sanitize:true }}',
+      suggested_citation_long: '{{ suggested_citation_long | collapse_whitespace | add_slashes | sanitize:true }}',
       suggested_citation_short: '{{ suggested_citation_short | add_slashes | sanitize:true }}',
       original_language: '{{ original_language }}',
       locale: '{{ locale }}',
@@ -64,7 +64,7 @@
       version-timestamp="{{ versionTimestamp }}"
       :open="true">
       <template v-slot:title>
-        {{ $t('compare_versions') }}
+        {{$ __('compare_versions') $}}
       </template>
       <template v-slot:body>
         <div class="prose max-w-full version-comparison">

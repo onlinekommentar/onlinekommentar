@@ -303,7 +303,6 @@
 
     :deep(p) {
       @apply lg:text-xl !leading-[1.5em] relative font-serif mb-6;
-      @apply scroll-mt-12 md:scroll-mt-16 lg:scroll-mt-24;
 
       a {
         @apply underline break-all print:break-inside-avoid
@@ -312,6 +311,13 @@
       em {
         @apply tracking-wide
       }
+    }
+
+    :deep(h2),
+    :deep(h3),
+    :deep(h4),
+    :deep(p) {
+      @apply scroll-mt-12 md:scroll-mt-16 lg:scroll-mt-24
     }
 
     :deep(.paragraph-nr) {

@@ -1,5 +1,5 @@
 <template>
-  <Popover v-slot="{ open }">
+  <Popover v-slot="{ open, close }">
     <PopoverButton :class="[open ? 'text-gray-900' : 'text-gray-800', 'group inline-flex items-center bg-white text-base font-medium hover:text-gray-900 focus:outline-none']">
       <span class="text-xs tracking-widest uppercase">
         {{ label }}
@@ -14,7 +14,7 @@
 
     <transition enter-active-class="transition duration-200 ease-out" enter-from-class="translate-y-1 opacity-0" enter-to-class="translate-y-0 opacity-100" leave-active-class="transition duration-150 ease-in" leave-from-class="translate-y-0 opacity-100" leave-to-class="translate-y-1 opacity-0">
       <PopoverPanel class="absolute inset-x-0 z-10 bg-white shadow-md" :class="menuClasses">
-        <div class="p-4 overflow-hidden drop-shadow-2xl ring-1 ring-black ring-opacity-5 print:block print:drop-shadow-none print:ring-none print:overflow-auto">
+        <div @click="clicked($event, close)" class="p-4 overflow-hidden drop-shadow-2xl ring-1 ring-black ring-opacity-5 print:block print:drop-shadow-none print:ring-none print:overflow-auto">
           <slot />
         </div>
       </PopoverPanel>
@@ -30,6 +30,12 @@
     label: { type: String, required: true },
     menuClasses: { type: String, required: false, default: null }
   })
+
+  async function clicked(event, close) {
+    if (event.target.tagName === 'A') {
+      close();
+    }
+  }
 </script>
 
 <style lang="postcss" scoped>
