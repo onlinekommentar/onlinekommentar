@@ -15,6 +15,7 @@ use Statamic\Facades\Entry;
 use Statamic\Facades\User;
 use Statamic\Modifiers\CoreModifiers;
 use Statamic\View\View;
+use Textandbytes\Converter\Converter;
 use TOC\MarkupFixer;
 use TOC\TocGenerator;
 
@@ -356,5 +357,28 @@ class CommentariesController extends Controller
         $renderer = RendererFactory::make($rendererName, $rendererOptions);
 
         return html_entity_decode($renderer->render($differ));
+    }
+
+    public function download($locale, $commentarySlug)
+    {
+        $entry = Entry::query()
+            ->where('collection', 'commentaries')
+            ->where('locale', $locale)
+            ->where('slug', $commentarySlug)
+            ->first();
+
+        if (! $entry) {
+            abort(404);
+        }
+
+        if ($entry['status'] !== 'published' && ! User::current()) {
+            abort(404);
+        }
+
+        $file = (new Converter)->entryToWord($entry);
+
+        return response()
+            ->download($file, "{$entry->slug}.docx")
+            ->deleteFileAfterSend(true);
     }
 }

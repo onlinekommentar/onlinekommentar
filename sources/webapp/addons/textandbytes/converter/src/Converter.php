@@ -59,28 +59,65 @@ class Converter
         return (new WordRenderer)->render($data);
     }
 
-    public function entryToWord($entry)
+    public function entryToWord($entry, $format = 'Word2007')
     {
         if ($entry->collection()->handle() !== 'commentaries') {
             throw new \Exception('Entry is not a commentary');
         }
 
-        $data = array_merge(
-            $this->makeHeading($entry->title, 0),
-            $entry->get('content') ?? [],
-            $this->makeHeading('Assigned Authors', 1),
-            $this->makeParagraph($entry->assigned_authors->pluck('name')->join(', ')),
-            $this->makeHeading('Assigned Editors', 1),
-            $this->makeParagraph($entry->assigned_editors->pluck('name')->join(', ')),
-            $this->makeHeading('Suggested Citation', 1),
-            $this->makeParagraph($entry->suggested_citation_long),
-            $this->makeHeading('Legal Text', 1),
-            $entry->get('legal_text') ?? [],
-        );
+        $data = [
+            [
+                'type' => 'okLogo',
+            ],
+            [
+                'type' => 'okTitle',
+                'label' => 'Commentary on',
+                'text' => $entry->title,
+            ],
+            [
+                'type' => 'okSummary',
+                'lines' => [
+                    'A commentary by '.$entry->assigned_authors->pluck('name')->join(', '),
+                    'Edited by '.$entry->assigned_editors->pluck('name')->join(', '),
+                ],
+            ],
+            [
+                'type' => 'okSuggestedCitationLong',
+                'label' => 'Sugegsted Citation',
+                'text' => $entry->suggested_citation_long,
+            ],
+            [
+                'type' => 'okSuggestedCitationShort',
+                'label' => 'Short Citation',
+                'text' => $entry->suggested_citation_short,
+            ],
+            [
+                'type' => 'okLegalText',
+                'content' => [
+                    ...$entry->get('legal_text') ?? [],
+                ],
+            ],
+            [
+                'type' => 'pageBreak',
+            ],
+            [
+                'type' => 'tableOfContents',
+                'label' => 'Table of Contents',
+            ],
+            [
+                'type' => 'pageBreak',
+            ],
+            ...$entry->get('content') ?? [],
+        ];
 
         $data = json_decode(json_encode($data));
 
-        return (new WordRenderer)->render($data);
+        return (new WordRenderer)->render($data, $format);
+    }
+
+    public function entryToHtml($entry)
+    {
+        return $this->entryToWord($entry, 'HTML');
     }
 
     public function entryToPdf($entry)
@@ -99,22 +136,22 @@ class Converter
 
     protected function makeParagraph($text)
     {
-        return [[
+        return [
             'type' => 'paragraph',
             'content' => [
                 ['type' => 'text', 'text' => $text],
             ],
-        ]];
+        ];
     }
 
     protected function makeHeading($text, $level)
     {
-        return [[
+        return [
             'type' => 'heading',
             'attrs' => ['level' => $level],
             'content' => [
                 ['type' => 'text', 'text' => $text],
             ],
-        ]];
+        ];
     }
 }

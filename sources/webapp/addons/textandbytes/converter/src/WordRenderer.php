@@ -2,6 +2,7 @@
 
 namespace Textandbytes\Converter;
 
+use Illuminate\Support\Arr;
 use PhpOffice\PhpWord\Element\TextRun;
 use PhpOffice\PhpWord\PhpWord;
 use PhpOffice\PhpWord\Settings;
@@ -20,6 +21,17 @@ class WordRenderer
     protected $editor;
 
     protected $word;
+
+    protected $margin = [
+        'top' => 15,
+        'right' => 15,
+        'bottom' => 15,
+        'left' => 15,
+    ];
+
+    protected $colors = [
+        'brown' => '#f4e8d7',
+    ];
 
     public function __construct()
     {
@@ -45,25 +57,33 @@ class WordRenderer
         $this->word->setDefaultFontName('Times New Roman');
         $this->word->setDefaultFontSize(12);
 
-        $this->word->addTitleStyle(0, [
-            'size' => 24,
-        ]);
         $this->word->addTitleStyle(1, [
-            'size' => 22,
-        ]);
-        $this->word->addTitleStyle(2, [
+            'name' => 'Arial',
             'size' => 20,
         ]);
-        $this->word->addTitleStyle(3, [
+        $this->word->addTitleStyle(2, [
+            'name' => 'Arial',
+            'allCaps' => true,
             'size' => 18,
         ]);
-        $this->word->addTitleStyle(4, [
+        $this->word->addTitleStyle(3, [
+            'name' => 'Arial',
+            'allCaps' => true,
             'size' => 16,
         ]);
-        $this->word->addTitleStyle(5, [
+        $this->word->addTitleStyle(4, [
+            'name' => 'Arial',
+            'allCaps' => true,
             'size' => 14,
         ]);
+        $this->word->addTitleStyle(5, [
+            'name' => 'Arial',
+            'allCaps' => true,
+            'size' => 12,
+        ]);
         $this->word->addTitleStyle(6, [
+            'name' => 'Arial',
+            'allCaps' => true,
             'size' => 12,
         ]);
 
@@ -76,14 +96,14 @@ class WordRenderer
             'spacing' => $this->lineHeight(1.08),
             'alignment' => Jc::BOTH,
             'indentation' => [
-                'left' => $this->cm(1),
-                'hanging' => $this->cm(1),
+                'left' => $this->tp(10),
+                'hanging' => $this->tp(10),
             ],
         ]);
 
         $this->word->addTableStyle('table', [
             'borderSize' => 1,
-            'cellMargin' => $this->cm(0.1),
+            'cellMargin' => $this->tp(1),
         ], [
             'bgColor' => 'EEEEEE',
         ]);
@@ -93,12 +113,18 @@ class WordRenderer
         ]);
     }
 
-    public function render($data)
+    public function render($data, $format = 'Word2007')
     {
         $this->renderSection($data, $this->word);
 
-        $file = tempnam(sys_get_temp_dir(), 'PHPWord-').'.docx';
-        $this->word->save($file, 'Word2007');
+        $extension = match ($format) {
+            'Word2007' => 'docx',
+            'HTML' => 'html',
+            'PDF' => 'pdf',
+        };
+
+        $file = tempnam(sys_get_temp_dir(), 'PHPWord-').'.'.$extension;
+        $this->word->save($file, $format);
 
         return $file;
     }
@@ -106,10 +132,10 @@ class WordRenderer
     protected function renderSection($nodes, $cursor)
     {
         $this->renderNodes($nodes, $cursor->addSection([
-            'marginTop' => $this->cm(2.5),
-            'marginLeft' => $this->cm(2.5),
-            'marginRight' => $this->cm(2.5),
-            'marginBottom' => $this->cm(2.5),
+            'marginTop' => $this->tp($this->margin['top']),
+            'marginRight' => $this->tp($this->margin['right']),
+            'marginBottom' => $this->tp($this->margin['bottom']),
+            'marginLeft' => $this->tp($this->margin['left']),
         ]));
     }
 
@@ -123,28 +149,30 @@ class WordRenderer
     protected function renderNode($node, $cursor, $pass = [])
     {
         $method = 'render'.ucfirst(Str::camel($node->type));
-        if (! method_exists($this, $method)) {
-            return;
-        }
 
         $this->$method($node, $cursor, ...$pass);
     }
 
-    protected function renderHeading($node, $cursor)
+    protected function renderHeading($node, $cursor, $blockStyle = [])
     {
-        $textRun = new TextRun();
-        $this->renderNodes($node->content ?? [], $textRun);
-        $cursor->addTitle($textRun, $node->attrs->level ?? 1);
+        $text = collect($node->content ?? [])->map(fn ($node) => $node->text)->join('');
+
+        $cursor->addTitle($text, $node->attrs->level ?? 1);
         $cursor->addTextBreak();
+
+        // $textRun = new TextRun($blockStyle);
+        // $this->renderNodes($node->content ?? [], $textRun);
+        // $cursor->addTitle($textRun, $node->attrs->level ?? 1);
+        // $cursor->addTextBreak();
     }
 
-    protected function renderParagraph($node, $cursor)
+    protected function renderParagraph($node, $cursor, $blockStyle = [], $textStyle = [])
     {
         if ($this->isParagraphWithNumber($node)) {
             return $this->renderParagraphWithNumber($node, $cursor);
         }
 
-        $this->renderNodes($node->content ?? [], $cursor->addTextRun());
+        $this->renderNodes($node->content ?? [], $cursor->addTextRun($blockStyle), $textStyle);
         $cursor->addTextBreak();
     }
 
@@ -172,16 +200,13 @@ class WordRenderer
         $this->renderList($node, $cursor, $level, ['listType' => ListItem::TYPE_ALPHANUM]);
     }
 
-    protected function renderList($node, $cursor, $level, $style)
+    protected function renderList($node, $cursor, $level, $blockStyle)
     {
         foreach ($node->content ?? [] as $item) {
             $content = $item->content ?? [];
             $text = array_shift($content);
-            $this->renderNodes($text->content ?? [], $cursor->addListItemRun($level, $style));
+            $this->renderNodes($text->content ?? [], $cursor->addListItemRun($level, $blockStyle));
             $this->renderNodes($content ?? [], $cursor, $level + 1);
-        }
-        if ($level === 0) {
-            $cursor->addTextBreak();
         }
     }
 
@@ -233,13 +258,18 @@ class WordRenderer
         $cursor->addTextBreak();
     }
 
-    protected function renderText($node, $cursor, $style = [])
+    protected function renderText($node, $cursor, $textStyle = [])
     {
         if ($this->isLink($node)) {
             return $this->renderLink($node, $cursor);
         }
 
-        $cursor->addText($node->text, $this->makeStyle($node, $style));
+        $cursor->addText($node->text, $this->makeStyle($node, $textStyle));
+    }
+
+    protected function renderPageBreak($node, $cursor)
+    {
+        $cursor->addPageBreak();
     }
 
     protected function renderHardBreak($node, $cursor)
@@ -259,6 +289,116 @@ class WordRenderer
         $this->renderNodes($nodes ?? [], $cursor->addFootnote(), [
             'size' => 10,
         ]);
+    }
+
+    protected function renderTableOfContents($node, $cursor)
+    {
+        $labelNodes = $this->makeText($node->label);
+
+        $this->renderNodes($labelNodes, $cursor->addTextRun([
+            'alignment' => Jc::START,
+            'spaceAfter' => $this->tp(2),
+        ]), [
+            'name' => 'Arial',
+            'allCaps' => true,
+            'size' => 12,
+        ]);
+
+        $cursor->addTOC([
+            'size' => 12,
+        ]);
+    }
+
+    protected function renderOkLogo($node, $cursor)
+    {
+        $file = public_path('img/ok-logo-text_en.png');
+        $cursor->addImage($file, [
+            'width' => $this->pt(75),
+            'alignment' => Jc::CENTER,
+        ]);
+    }
+
+    protected function renderOkTitle($node, $cursor)
+    {
+        $labelNodes = $this->makeText($node->label);
+        $textNodes = $this->makeText($node->text);
+
+        $this->renderNodes($labelNodes, $cursor->addTextRun([
+            'spaceBefore' => $this->tp(5),
+            'spaceAfter' => $this->tp(3),
+            'alignment' => Jc::CENTER,
+        ]), [
+            'name' => 'Arial',
+            'allCaps' => true,
+            'size' => 12,
+        ]);
+        $this->renderNodes($textNodes, $cursor->addTextRun([
+            'spaceAfter' => $this->tp(3),
+            'alignment' => Jc::CENTER,
+        ]), [
+            'size' => 28,
+        ]);
+    }
+
+    protected function renderOkSummary($node, $cursor)
+    {
+        $nodes = $this->makeText($node->lines);
+
+        $this->renderNodes($nodes, $cursor->addTextRun([
+            'spaceAfter' => $this->tp(5),
+            'alignment' => Jc::CENTER,
+        ]));
+        $cursor->addTextBreak();
+    }
+
+    protected function renderOkSuggestedCitationLong($node, $cursor)
+    {
+        $labelNodes = $this->makeText($node->label);
+        $textNodes = $this->makeText($node->text);
+
+        $this->renderNodes($labelNodes, $cursor->addTextRun([
+            'alignment' => Jc::START,
+            'spaceAfter' => $this->tp(2),
+        ]), [
+            'name' => 'Arial',
+            'allCaps' => true,
+            'size' => 12,
+        ]);
+        $this->renderNodes($textNodes, $cursor->addTextRun([
+            'alignment' => Jc::START,
+            'spaceAfter' => $this->tp(2),
+        ]));
+    }
+
+    protected function renderOkSuggestedCitationShort($node, $cursor)
+    {
+        $nodes = $this->makeText($node->label.': '.$node->text);
+
+        $this->renderNodes($nodes, $cursor->addTextRun([
+            'spaceAfter' => $this->tp(10),
+        ]));
+    }
+
+    protected function renderOkLegalText($node, $cursor)
+    {
+        $table = $cursor->addTable([
+            'borderColor' => $this->colors['brown'],
+            'cellMargin' => $this->tp(5),
+        ]);
+        $table->addRow();
+        $cell = $table->addCell(null, [
+            'bgColor' => $this->colors['brown'],
+        ]);
+
+        $nodes = collect($node->content ?? [])
+            ->each(function ($node) {
+                if ($node->type === 'heading') {
+                    $node->type = 'paragraph';
+                }
+            })
+            ->all();
+
+        $this->renderNodes($nodes, $cell);
     }
 
     protected function parseFootnoteHtml($html)
@@ -297,25 +437,31 @@ class WordRenderer
         return true;
     }
 
-    protected function makeStyle($node, $style = [])
+    protected function makeStyle($node, $textStyle = [])
     {
         $marks = collect($node->marks ?? [])->map->type;
 
         if ($marks->contains('bold')) {
-            $style['bold'] = true;
+            $textStyle['bold'] = true;
         }
         if ($marks->contains('italic')) {
-            $style['italic'] = true;
+            $textStyle['italic'] = true;
         }
         if ($marks->contains('underline')) {
-            $style['underline'] = Font::UNDERLINE_SINGLE;
+            $textStyle['underline'] = Font::UNDERLINE_SINGLE;
+        }
+        if ($marks->contains('superscript')) {
+            $textStyle['superScript'] = true;
+        }
+        if ($marks->contains('subscript')) {
+            $textStyle['subScript'] = true;
         }
         if ($marks->contains('link')) {
-            $style['color'] = '0000FF';
-            $style['underline'] = Font::UNDERLINE_SINGLE;
+            $textStyle['color'] = '0000FF';
+            $textStyle['underline'] = Font::UNDERLINE_SINGLE;
         }
 
-        return $style;
+        return $textStyle;
     }
 
     protected function findMark($node, $type)
@@ -323,13 +469,55 @@ class WordRenderer
         return collect($node->marks ?? [])->first(fn ($mark) => $mark->type === $type);
     }
 
-    protected function cm($value)
+    protected function tp($value)
     {
-        return Converter::cmToTwip($value);
+        return Converter::cmToTwip($value / 10);
+    }
+
+    protected function pt($value)
+    {
+        return Converter::cmToPoint($value / 10);
     }
 
     protected function lineHeight($value)
     {
         return 240 * ($value - 1);
+    }
+
+    protected function makeHeading($text, $level)
+    {
+        return (object) [
+            'type' => 'heading',
+            'attrs' => (object) ['level' => $level],
+            'content' => $this->makeText($text),
+        ];
+    }
+
+    protected function makeParagraph($text)
+    {
+        return (object) [
+            'type' => 'paragraph',
+            'content' => $this->makeText($text),
+        ];
+    }
+
+    protected function makeText($lines)
+    {
+        $lines = Arr::wrap($lines);
+
+        $nodes = [];
+        foreach ($lines as $i => $line) {
+            if ($i) {
+                $nodes[] = (object) [
+                    'type' => 'hardBreak',
+                ];
+            }
+            $nodes[] = (object) [
+                'type' => 'text',
+                'text' => $line,
+            ];
+        }
+
+        return $nodes;
     }
 }
