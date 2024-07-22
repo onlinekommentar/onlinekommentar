@@ -3,11 +3,11 @@
 namespace Textandbytes\Converter;
 
 use Illuminate\Support\Arr;
-use PhpOffice\PhpWord\Element\TextRun;
 use PhpOffice\PhpWord\PhpWord;
 use PhpOffice\PhpWord\Settings;
 use PhpOffice\PhpWord\Shared\Converter;
 use PhpOffice\PhpWord\SimpleType\Jc;
+use PhpOffice\PhpWord\SimpleType\TblWidth;
 use PhpOffice\PhpWord\Style\Font;
 use PhpOffice\PhpWord\Style\Language;
 use PhpOffice\PhpWord\Style\ListItem;
@@ -23,10 +23,10 @@ class WordRenderer
     protected $word;
 
     protected $margin = [
-        'top' => 15,
-        'right' => 15,
-        'bottom' => 15,
-        'left' => 15,
+        'top' => 20,
+        'right' => 20,
+        'bottom' => 20,
+        'left' => 20,
     ];
 
     protected $colors = [
@@ -39,6 +39,7 @@ class WordRenderer
 
         $this->word = new PhpWord();
         $this->word->getSettings()->setThemeFontLang(new Language(Language::DE_DE));
+        $this->word->getSettings()->setUpdateFields(true);
         $this->defineStyles();
 
         $this->editor = new Editor([
@@ -59,32 +60,47 @@ class WordRenderer
 
         $this->word->addTitleStyle(1, [
             'name' => 'Arial',
-            'size' => 20,
+            'size' => 14,
+            'allCaps' => true,
+            'alignment' => Jc::START,
+        ], [
+            'spaceBefore' => $this->twip(10),
+            'spaceAfter' => $this->twip(5),
         ]);
         $this->word->addTitleStyle(2, [
             'name' => 'Arial',
+            'size' => 14,
             'allCaps' => true,
-            'size' => 18,
+            'alignment' => Jc::START,
+        ], [
+            'spaceBefore' => $this->twip(10),
+            'spaceAfter' => $this->twip(5),
         ]);
         $this->word->addTitleStyle(3, [
             'name' => 'Arial',
-            'allCaps' => true,
-            'size' => 16,
+            'size' => 14,
+            'alignment' => Jc::START,
+        ], [
+            'spaceBefore' => $this->twip(5),
+            'spaceAfter' => $this->twip(5),
         ]);
         $this->word->addTitleStyle(4, [
             'name' => 'Arial',
-            'allCaps' => true,
-            'size' => 14,
+            'size' => 12,
+            'alignment' => Jc::START,
+        ], [
+            'spaceBefore' => $this->twip(5),
+            'spaceAfter' => $this->twip(5),
         ]);
         $this->word->addTitleStyle(5, [
             'name' => 'Arial',
-            'allCaps' => true,
             'size' => 12,
+            'alignment' => Jc::START,
         ]);
         $this->word->addTitleStyle(6, [
             'name' => 'Arial',
-            'allCaps' => true,
             'size' => 12,
+            'alignment' => Jc::START,
         ]);
 
         $this->word->setDefaultParagraphStyle([
@@ -96,14 +112,14 @@ class WordRenderer
             'spacing' => $this->lineHeight(1.08),
             'alignment' => Jc::BOTH,
             'indentation' => [
-                'left' => $this->tp(10),
-                'hanging' => $this->tp(10),
+                // 'left' => $this->twip(5),
+                'hanging' => $this->twip(7),
             ],
         ]);
 
         $this->word->addTableStyle('table', [
             'borderSize' => 1,
-            'cellMargin' => $this->tp(1),
+            'cellMargin' => $this->twip(1),
         ], [
             'bgColor' => 'EEEEEE',
         ]);
@@ -131,12 +147,14 @@ class WordRenderer
 
     protected function renderSection($nodes, $cursor)
     {
-        $this->renderNodes($nodes, $cursor->addSection([
-            'marginTop' => $this->tp($this->margin['top']),
-            'marginRight' => $this->tp($this->margin['right']),
-            'marginBottom' => $this->tp($this->margin['bottom']),
-            'marginLeft' => $this->tp($this->margin['left']),
-        ]));
+        $section = $cursor->addSection([
+            'marginTop' => $this->twip($this->margin['top']),
+            'marginRight' => $this->twip($this->margin['right']),
+            'marginBottom' => $this->twip($this->margin['bottom']),
+            'marginLeft' => $this->twip($this->margin['left']),
+        ]);
+
+        $this->renderNodes($nodes, $section);
     }
 
     protected function renderNodes($nodes, $cursor, ...$pass)
@@ -158,12 +176,6 @@ class WordRenderer
         $text = collect($node->content ?? [])->map(fn ($node) => $node->text)->join('');
 
         $cursor->addTitle($text, $node->attrs->level ?? 1);
-        $cursor->addTextBreak();
-
-        // $textRun = new TextRun($blockStyle);
-        // $this->renderNodes($node->content ?? [], $textRun);
-        // $cursor->addTitle($textRun, $node->attrs->level ?? 1);
-        // $cursor->addTextBreak();
     }
 
     protected function renderParagraph($node, $cursor, $blockStyle = [], $textStyle = [])
@@ -173,7 +185,6 @@ class WordRenderer
         }
 
         $this->renderNodes($node->content ?? [], $cursor->addTextRun($blockStyle), $textStyle);
-        $cursor->addTextBreak();
     }
 
     protected function renderParagraphWithNumber($node, $cursor)
@@ -181,13 +192,12 @@ class WordRenderer
         $first = $node->content[0] ?? null;
         $second = $node->content[1] ?? null;
 
-        $first->text = "#{$first->text}#\t";
+        $first->text = $first->text."\t";
         if ($second && $second->type === 'text') {
             $second->text = ltrim($second->text);
         }
 
         $this->renderNodes($node->content ?? [], $cursor->addTextRun('withNumber'));
-        $cursor->addTextBreak();
     }
 
     protected function renderBulletList($node, $cursor, $level = 0)
@@ -296,16 +306,18 @@ class WordRenderer
         $labelNodes = $this->makeText($node->label);
 
         $this->renderNodes($labelNodes, $cursor->addTextRun([
-            'alignment' => Jc::START,
-            'spaceAfter' => $this->tp(2),
+            'spaceBefore' => $this->twip(10),
+            'spaceAfter' => $this->twip(5),
         ]), [
             'name' => 'Arial',
+            'size' => 14,
             'allCaps' => true,
-            'size' => 12,
         ]);
 
         $cursor->addTOC([
             'size' => 12,
+        ], [
+            'tabPos' => $this->twip(170),
         ]);
     }
 
@@ -313,7 +325,7 @@ class WordRenderer
     {
         $file = public_path('img/ok-logo-text_en.png');
         $cursor->addImage($file, [
-            'width' => $this->pt(75),
+            'width' => $this->point(75),
             'alignment' => Jc::CENTER,
         ]);
     }
@@ -324,8 +336,8 @@ class WordRenderer
         $textNodes = $this->makeText($node->text);
 
         $this->renderNodes($labelNodes, $cursor->addTextRun([
-            'spaceBefore' => $this->tp(5),
-            'spaceAfter' => $this->tp(3),
+            'spaceBefore' => $this->twip(5),
+            'spaceAfter' => $this->twip(3),
             'alignment' => Jc::CENTER,
         ]), [
             'name' => 'Arial',
@@ -333,7 +345,7 @@ class WordRenderer
             'size' => 12,
         ]);
         $this->renderNodes($textNodes, $cursor->addTextRun([
-            'spaceAfter' => $this->tp(3),
+            'spaceAfter' => $this->twip(3),
             'alignment' => Jc::CENTER,
         ]), [
             'size' => 28,
@@ -345,7 +357,7 @@ class WordRenderer
         $nodes = $this->makeText($node->lines);
 
         $this->renderNodes($nodes, $cursor->addTextRun([
-            'spaceAfter' => $this->tp(5),
+            'spaceAfter' => $this->twip(5),
             'alignment' => Jc::CENTER,
         ]));
         $cursor->addTextBreak();
@@ -358,7 +370,7 @@ class WordRenderer
 
         $this->renderNodes($labelNodes, $cursor->addTextRun([
             'alignment' => Jc::START,
-            'spaceAfter' => $this->tp(2),
+            'spaceAfter' => $this->twip(2),
         ]), [
             'name' => 'Arial',
             'allCaps' => true,
@@ -366,7 +378,7 @@ class WordRenderer
         ]);
         $this->renderNodes($textNodes, $cursor->addTextRun([
             'alignment' => Jc::START,
-            'spaceAfter' => $this->tp(2),
+            'spaceAfter' => $this->twip(2),
         ]));
     }
 
@@ -375,7 +387,7 @@ class WordRenderer
         $nodes = $this->makeText($node->label.': '.$node->text);
 
         $this->renderNodes($nodes, $cursor->addTextRun([
-            'spaceAfter' => $this->tp(10),
+            'spaceAfter' => $this->twip(10),
         ]));
     }
 
@@ -383,10 +395,12 @@ class WordRenderer
     {
         $table = $cursor->addTable([
             'borderColor' => $this->colors['brown'],
-            'cellMargin' => $this->tp(5),
+            'cellMargin' => $this->twip(5),
         ]);
         $table->addRow();
         $cell = $table->addCell(null, [
+            'width' => $this->twip(210 - $this->margin['left'] - $this->margin['right']),
+            'unit' => TblWidth::TWIP,
             'bgColor' => $this->colors['brown'],
         ]);
 
@@ -419,7 +433,7 @@ class WordRenderer
             return false;
         }
 
-        $mark = $this->findMark($first, 'btsSpan');
+        $mark = $this->findMark($first, ['btsSpan', 'bts_span']);
         if (! $mark || $mark->attrs->class !== 'paragraph-nr') {
             return false;
         }
@@ -460,21 +474,29 @@ class WordRenderer
             $textStyle['color'] = '0000FF';
             $textStyle['underline'] = Font::UNDERLINE_SINGLE;
         }
+        if ($mark = $this->findMark($node, ['bts_span', 'btsSpan'])) {
+            if ($mark->attrs->class === 'paragraph-nr') {
+                $textStyle['name'] = 'Arial';
+                $textStyle['size'] = 10;
+            }
+        }
 
         return $textStyle;
     }
 
-    protected function findMark($node, $type)
+    protected function findMark($node, $types)
     {
-        return collect($node->marks ?? [])->first(fn ($mark) => $mark->type === $type);
+        $types = Arr::wrap($types);
+
+        return collect($node->marks ?? [])->first(fn ($mark) => in_array($mark->type, $types));
     }
 
-    protected function tp($value)
+    protected function twip($value)
     {
         return Converter::cmToTwip($value / 10);
     }
 
-    protected function pt($value)
+    protected function point($value)
     {
         return Converter::cmToPoint($value / 10);
     }

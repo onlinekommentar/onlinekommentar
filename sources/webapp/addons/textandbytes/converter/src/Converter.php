@@ -104,9 +104,6 @@ class Converter
                 'type' => 'tableOfContents',
                 'label' => 'Table of Contents',
             ],
-            [
-                'type' => 'pageBreak',
-            ],
             ...$entry->get('content') ?? [],
         ];
 
