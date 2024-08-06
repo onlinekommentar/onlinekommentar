@@ -4,7 +4,9 @@ namespace Textandbytes\Converter;
 
 use Gotenberg\Gotenberg;
 use Gotenberg\Stream;
+use Pontedilana\PhpWeasyPrint\Pdf;
 use Statamic\Support\Str;
+use Statamic\View\View;
 use Textandbytes\Converter\Marks\ParagraphNumber;
 use Textandbytes\Converter\Nodes\Cleaner;
 use Textandbytes\Converter\Nodes\Footnote;
@@ -59,16 +61,13 @@ class Converter
         return (new WordRenderer)->render($data);
     }
 
-    public function entryToWord($entry, $format = 'Word2007')
+    public function entryToWord($entry)
     {
         if ($entry->collection()->handle() !== 'commentaries') {
             throw new \Exception('Entry is not a commentary');
         }
 
         $data = [
-            [
-                'type' => 'okLogo',
-            ],
             [
                 'type' => 'okTitle',
                 'label' => 'Commentary on',
@@ -109,15 +108,10 @@ class Converter
 
         $data = json_decode(json_encode($data));
 
-        return (new WordRenderer)->render($data, $format);
+        return (new WordRenderer)->render($data);
     }
 
-    public function entryToHtml($entry)
-    {
-        return $this->entryToWord($entry, 'HTML');
-    }
-
-    public function entryToPdf($entry)
+    public function entryToWordPdf($entry)
     {
         $wordFile = $this->entryToWord($entry);
 
@@ -127,6 +121,27 @@ class Converter
         $pdfFile = $dir.'/'.Gotenberg::save($request, $dir);
 
         unlink($wordFile);
+
+        return $pdfFile;
+    }
+
+    public function entryToHtml($entry)
+    {
+        return (new View)
+            ->template('commentaries.print')
+            ->layout('print')
+            ->cascadeContent($entry)
+            ->render();
+    }
+
+    public function entryToHtmlPdf($entry)
+    {
+        $html = $this->entryToHtml($entry);
+
+        $pdfFile = storage_path('app').'/weasyprint-'.uniqid().'.pdf';
+
+        $pdf = new Pdf(config('services.weasyprint.bin'));
+        $pdf->generateFromHtml($html, $pdfFile);
 
         return $pdfFile;
     }

@@ -375,10 +375,15 @@ class CommentariesController extends Controller
             abort(404);
         }
 
-        $file = (new Converter)->entryToWord($entry);
+        // $html = (new Converter)->entryToHtml($entry);
+
+        // return $html;
+
+        $file = (new Converter)->entryToHtmlPdf($entry);
 
         return response()
-            ->download($file, "{$entry->slug}.docx")
-            ->deleteFileAfterSend(true);
+            ->file($file)
+            // ->download($file, "{$entry->slug}.pdf")
+;
     }
 }

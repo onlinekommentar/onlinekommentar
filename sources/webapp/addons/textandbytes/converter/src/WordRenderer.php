@@ -59,57 +59,39 @@ class WordRenderer
         $this->word->setDefaultFontSize(12);
 
         $this->word->addTitleStyle(1, [
-            'name' => 'Arial',
             'size' => 14,
             'allCaps' => true,
             'alignment' => Jc::START,
-        ], [
-            'spaceBefore' => $this->twip(10),
-            'spaceAfter' => $this->twip(5),
         ]);
         $this->word->addTitleStyle(2, [
-            'name' => 'Arial',
             'size' => 14,
             'allCaps' => true,
             'alignment' => Jc::START,
-        ], [
-            'spaceBefore' => $this->twip(10),
-            'spaceAfter' => $this->twip(5),
         ]);
         $this->word->addTitleStyle(3, [
-            'name' => 'Arial',
             'size' => 14,
             'alignment' => Jc::START,
-        ], [
-            'spaceBefore' => $this->twip(5),
-            'spaceAfter' => $this->twip(5),
         ]);
         $this->word->addTitleStyle(4, [
-            'name' => 'Arial',
             'size' => 12,
             'alignment' => Jc::START,
-        ], [
-            'spaceBefore' => $this->twip(5),
-            'spaceAfter' => $this->twip(5),
         ]);
         $this->word->addTitleStyle(5, [
-            'name' => 'Arial',
             'size' => 12,
             'alignment' => Jc::START,
         ]);
         $this->word->addTitleStyle(6, [
-            'name' => 'Arial',
             'size' => 12,
             'alignment' => Jc::START,
         ]);
 
         $this->word->setDefaultParagraphStyle([
-            'spacing' => $this->lineHeight(1.08),
+            'spacing' => $this->lineHeight(1.1),
             'alignment' => Jc::BOTH,
         ]);
 
         $this->word->addParagraphStyle('withNumber', [
-            'spacing' => $this->lineHeight(1.08),
+            'spacing' => $this->lineHeight(1.1),
             'alignment' => Jc::BOTH,
             'indentation' => [
                 // 'left' => $this->twip(5),
@@ -135,6 +117,7 @@ class WordRenderer
 
         $extension = match ($format) {
             'Word2007' => 'docx',
+            'ODText' => 'odt',
             'HTML' => 'html',
             'PDF' => 'pdf',
         };
@@ -152,6 +135,13 @@ class WordRenderer
             'marginRight' => $this->twip($this->margin['right']),
             'marginBottom' => $this->twip($this->margin['bottom']),
             'marginLeft' => $this->twip($this->margin['left']),
+        ]);
+
+        $footer = $section->addFooter();
+        $footer->addPreserveText('{PAGE}/{NUMPAGES}', [
+            'size' => 10,
+        ], [
+            'alignment' => Jc::END,
         ]);
 
         $this->renderNodes($nodes, $section);
@@ -176,6 +166,7 @@ class WordRenderer
         $text = collect($node->content ?? [])->map(fn ($node) => $node->text)->join('');
 
         $cursor->addTitle($text, $node->attrs->level ?? 1);
+        $cursor->addTextBreak();
     }
 
     protected function renderParagraph($node, $cursor, $blockStyle = [], $textStyle = [])
@@ -185,6 +176,7 @@ class WordRenderer
         }
 
         $this->renderNodes($node->content ?? [], $cursor->addTextRun($blockStyle), $textStyle);
+        $cursor->addTextBreak();
     }
 
     protected function renderParagraphWithNumber($node, $cursor)
@@ -198,6 +190,7 @@ class WordRenderer
         }
 
         $this->renderNodes($node->content ?? [], $cursor->addTextRun('withNumber'));
+        $cursor->addTextBreak();
     }
 
     protected function renderBulletList($node, $cursor, $level = 0)
@@ -218,6 +211,7 @@ class WordRenderer
             $this->renderNodes($text->content ?? [], $cursor->addListItemRun($level, $blockStyle));
             $this->renderNodes($content ?? [], $cursor, $level + 1);
         }
+        $cursor->addTextBreak();
     }
 
     protected function renderTable($node, $cursor)
@@ -309,7 +303,6 @@ class WordRenderer
             'spaceBefore' => $this->twip(10),
             'spaceAfter' => $this->twip(5),
         ]), [
-            'name' => 'Arial',
             'size' => 14,
             'allCaps' => true,
         ]);
@@ -321,26 +314,15 @@ class WordRenderer
         ]);
     }
 
-    protected function renderOkLogo($node, $cursor)
-    {
-        $file = public_path('img/ok-logo-text_en.png');
-        $cursor->addImage($file, [
-            'width' => $this->point(75),
-            'alignment' => Jc::CENTER,
-        ]);
-    }
-
     protected function renderOkTitle($node, $cursor)
     {
         $labelNodes = $this->makeText($node->label);
         $textNodes = $this->makeText($node->text);
 
         $this->renderNodes($labelNodes, $cursor->addTextRun([
-            'spaceBefore' => $this->twip(5),
             'spaceAfter' => $this->twip(3),
             'alignment' => Jc::CENTER,
         ]), [
-            'name' => 'Arial',
             'allCaps' => true,
             'size' => 12,
         ]);
@@ -372,7 +354,6 @@ class WordRenderer
             'alignment' => Jc::START,
             'spaceAfter' => $this->twip(2),
         ]), [
-            'name' => 'Arial',
             'allCaps' => true,
             'size' => 12,
         ]);
@@ -476,7 +457,6 @@ class WordRenderer
         }
         if ($mark = $this->findMark($node, ['bts_span', 'btsSpan'])) {
             if ($mark->attrs->class === 'paragraph-nr') {
-                $textStyle['name'] = 'Arial';
                 $textStyle['size'] = 10;
             }
         }

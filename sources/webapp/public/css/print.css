@@ -1,0 +1,77 @@
+@font-face {
+    font-family: 'librecaslon';
+    src: url('/fonts/librecaslontext-bold-webfont.woff2') format('woff2'),
+         url('/fonts/librecaslontext-bold-webfont.woff') format('woff');
+    font-weight: 700;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'librecaslon';
+    src: url('/fonts/librecaslontext-italic-webfont.woff2') format('woff2'),
+         url('/fonts/librecaslontext-italic-webfont.woff') format('woff');
+    font-weight: 400;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'librecaslon';
+    src: url('/fonts/librecaslontext-regular-webfont.woff2') format('woff2'),
+         url('/fonts/librecaslontext-regular-webfont.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'worksans';
+    src: url('/fonts/WorkSans-Medium.woff2') format('woff2'),
+         url('/fonts/WorkSans-Medium.woff') format('woff');
+    font-weight: 500;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'worksans';
+    src: url('/fonts/WorkSans-MediumItalic.woff2') format('woff2'),
+         url('/fonts/WorkSans-MediumItalic.woff') format('woff');
+    font-weight: 500;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'worksans';
+    src: url('/fonts/WorkSans-Regular.woff2') format('woff2'),
+         url('/fonts/WorkSans-Regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'worksans';
+    src: url('/fonts/WorkSans-Italic.woff2') format('woff2'),
+         url('/fonts/WorkSans-Italic.woff') format('woff');
+    font-weight: 400;
+    font-style: italic;
+}
+
+@page {
+    size: A4;
+    margin: 1.5cm 1.5cm 2.5cm 1.5cm;
+    @bottom-right {
+        content: counter(page);
+    }
+}
+
+html {
+    font-size: 10pt;
+    font-family: librecaslon, serif;
+    line-height: 1.4;
+}
+
+.toc a::after {
+    content: target-counter(attr(href), page);
+}
+
+footnote {
+    float: footnote;
+} 

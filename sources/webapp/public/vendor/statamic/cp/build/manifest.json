@@ -1,6 +1,6 @@
 {
   "resources/css/tailwind.css": {
-    "file": "assets/tailwind-a2d809bc.css",
+    "file": "assets/tailwind-59af35c9.css",
     "isEntry": true,
     "src": "resources/css/tailwind.css"
   },
@@ -25,12 +25,12 @@
     "src": "resources/img/favicon.ico"
   },
   "resources/js/app.css": {
-    "file": "assets/app-5c6f743a.css",
+    "file": "assets/app-3c9f2f01.css",
     "src": "resources/js/app.css"
   },
   "resources/js/app.js": {
     "css": [
-      "assets/app-5c6f743a.css"
+      "assets/app-3c9f2f01.css"
     ],
     "dynamicImports": [
       "resources/svg/icons/light/add-circle.svg",
@@ -65,6 +65,7 @@
       "resources/svg/icons/light/content-writing.svg",
       "resources/svg/icons/light/crane.svg",
       "resources/svg/icons/light/date.svg",
+      "resources/svg/icons/light/dictionary.svg",
       "resources/svg/icons/light/download.svg",
       "resources/svg/icons/light/drag-dots.svg",
       "resources/svg/icons/light/drawer-file.svg",
@@ -465,6 +466,7 @@
       "resources/svg/icons/light/content-writing.svg",
       "resources/svg/icons/light/crane.svg",
       "resources/svg/icons/light/date.svg",
+      "resources/svg/icons/light/dictionary.svg",
       "resources/svg/icons/light/download.svg",
       "resources/svg/icons/light/drag-dots.svg",
       "resources/svg/icons/light/drawer-file.svg",
@@ -849,7 +851,7 @@
       "resources/svg/filetypes/video.svg",
       "resources/svg/filetypes/xml.svg"
     ],
-    "file": "assets/app-4e605ec2.js",
+    "file": "assets/app-4fb7000f.js",
     "isEntry": true,
     "src": "resources/js/app.js"
   },
@@ -1082,6 +1084,11 @@
     "file": "assets/date-6fddfc69.js",
     "isDynamicEntry": true,
     "src": "resources/svg/icons/light/date.svg"
+  },
+  "resources/svg/icons/light/dictionary.svg": {
+    "file": "assets/dictionary-b8229bb2.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/dictionary.svg"
   },
   "resources/svg/icons/light/download.svg": {
     "file": "assets/download-13d1cb2c.js",

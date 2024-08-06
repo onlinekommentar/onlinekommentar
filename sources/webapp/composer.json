@@ -10,6 +10,7 @@
     "require": {
         "php": "^8.2.0",
         "caseyamcl/toc": "^3.1",
+        "cweagans/composer-patches": "^1.7",
         "gotenberg/gotenberg-php": "^1.1",
         "guzzlehttp/guzzle": "^7.2",
         "jacksleight/statamic-bard-texstyle": "^3.0",
@@ -23,7 +24,8 @@
         "statamic/cms": "^5.0",
         "textandbytes/converter": "*",
         "textandbytes/footnotes": "*",
-        "tightenco/ziggy": "^1.0"
+        "tightenco/ziggy": "^1.0",
+        "pontedilana/php-weasyprint": "1.4.0"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.9",
@@ -68,6 +70,11 @@
     "extra": {
         "laravel": {
             "dont-discover": []
+        },
+        "patches": {
+            "phpoffice/phpword": {
+                "Fix footnote separator (PR 2635)": "patches/phpword-2635.diff"
+            }
         }
     },
     "config": {
@@ -76,7 +83,8 @@
         "sort-packages": true,
         "allow-plugins": {
             "pixelfear/composer-dist-plugin": true,
-            "php-http/discovery": true
+            "php-http/discovery": true,
+            "cweagans/composer-patches": true
         }
     },
     "minimum-stability": "dev",

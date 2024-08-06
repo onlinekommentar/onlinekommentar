@@ -35,4 +35,8 @@ return [
         'url' => env('GOTENBERG_URL', 'http://gotenberg:3000'),
     ],
 
+    'weasyprint' => [
+        'bin' => env('WEASYPRINT_BIN'),
+    ],
+
 ];

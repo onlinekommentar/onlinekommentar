@@ -25,6 +25,11 @@ class Footnote extends Node
 
     public function renderHTML($node, $HTMLAttributes = [])
     {
-        return ['footnote', HTML::mergeAttributes($this->options['HTMLAttributes'], $HTMLAttributes)];
+        $node->content = [(object) [
+            'type' => 'text',
+            'text' => $node->attrs->{'data-content'},
+        ]];
+
+        return ['footnote', HTML::mergeAttributes($this->options['HTMLAttributes'], $HTMLAttributes), 0];
     }
 }
