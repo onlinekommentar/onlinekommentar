@@ -30,7 +30,7 @@ class WordRenderer
     ];
 
     protected $colors = [
-        'brown' => '#f4e8d7',
+        'orange' => '#f4e8d7',
     ];
 
     public function __construct()
@@ -375,14 +375,14 @@ class WordRenderer
     protected function renderOkLegalText($node, $cursor)
     {
         $table = $cursor->addTable([
-            'borderColor' => $this->colors['brown'],
+            'borderColor' => $this->colors['orange'],
             'cellMargin' => $this->twip(5),
         ]);
         $table->addRow();
         $cell = $table->addCell(null, [
             'width' => $this->twip(210 - $this->margin['left'] - $this->margin['right']),
             'unit' => TblWidth::TWIP,
-            'bgColor' => $this->colors['brown'],
+            'bgColor' => $this->colors['orange'],
         ]);
 
         $nodes = collect($node->content ?? [])

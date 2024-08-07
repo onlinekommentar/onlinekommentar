@@ -1,24 +1,129 @@
 @import url('./fonts.css');
+@import 'tailwindcss/base';
+
+/* Page */
 
 @page {
     size: A4;
-    margin: 1.5cm 1.5cm 2.5cm 1.5cm;
+    margin: 15mm 15mm 25mm 15mm;
     @bottom-right {
-        content: counter(page);
+        content: counter(page) " / " counter(pages);
+        vertical-align: top;
+        padding-top: 5mm;
+        font-size: 8pt;
     }
 }
+
 html {
     font-size: 10pt;
     font-family: librecaslon, serif;
-    line-height: 1.4;
+    line-height: 1.5;
 }
 
+/* Footnotes */
 
-
-
-.toc a::after {
-    content: target-counter(attr(href), page);
+@page {
+    @footnote {
+        border-top: 0.5pt solid black;
+        padding-top: 0.5rem;
+        padding-left: 2rem;
+    }
 }
+
 footnote {
     float: footnote;
-} 
+}
+
+::footnote-call {
+    content: counter(footnote, decimal);
+    vertical-align: 0.3rem;
+    font-size: 0.7rem;
+}
+
+::footnote-marker {
+    content: counter(footnote, decimal) ". ";
+    width: 1.5rem;
+    text-align: right;
+    position: absolute;
+    left: 0;
+}
+
+/* Layout */
+
+.header {
+    text-align: center;
+    margin-bottom: 15mm;
+    > * + * {
+        margin-top: 0.75rem;
+    }
+    &-label {
+        text-transform: uppercase;
+        font-size: 1.2rem;
+    }
+    &-title {
+        font-size: 2.5rem;
+    }
+    &-authors {
+        font-size: 1.2rem;
+    }
+}
+
+.citation {
+    margin-bottom: 1.5rem;
+    > * + * {
+        margin-top: 0.75rem;
+    }
+    &-label {
+        text-transform: uppercase;
+        & + * {
+            margin-top: 0.25rem;
+        }
+    }
+}
+
+.legal-text {
+    background-color: #f4e8d7;
+    padding: 5mm;
+    > * + * {
+        margin-top: 0.75rem;
+    }
+}
+
+.toc {
+    a::after {
+        content: target-counter(attr(href), page);
+    }
+}
+
+/* Content */
+
+.content {
+    padding-left: 2rem;
+    > * + * {
+        margin-top: 0.75rem;
+    }
+    .paragraph-nr {
+        width: 1.5rem;
+        text-align: center;
+        position: absolute;
+        left: 0;
+        background: #EFEFEF;
+        border-radius: 9999999px;
+        font-size: 0.7rem;
+        padding: 0.15rem 0 0.05rem 0;
+        color: #575757;
+    }
+    h1, h2 {
+        font-size: 1.2rem;
+        text-transform: uppercase;
+    }
+    h3 {
+        font-size: 1.2rem;
+    }
+    h4, h5, h6 {
+        font-size: 1.1rem;
+    }
+    h1, h2, h3, h4, h5, h6 {
+        margin-top: 1.5rem;
+    }
+}
