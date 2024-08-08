@@ -1,4 +1,5 @@
 <header class="header">
+    <img src="{{ config:app:url }}/img/ok-logo-text_{{ locale }}.svg" class="header-logo">
     <p class="header-label">
         {{ trans:commentary_on }}
     </p>
@@ -25,7 +26,12 @@
     {{ legal_text }}
 </section>
 <section class="toc">
-    toc
+    <p class="toc-label">
+        {{ trans:table_of_contents }}
+    </p>
+    <div class="toc-list">
+        {{ toc }}
+    </div>
 </section>
 <main class="content">
     {{ content }}

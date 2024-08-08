@@ -359,7 +359,7 @@ class CommentariesController extends Controller
         return html_entity_decode($renderer->render($differ));
     }
 
-    public function download($locale, $commentarySlug)
+    public function print($locale, $commentarySlug)
     {
         $entry = Entry::query()
             ->where('collection', 'commentaries')
@@ -375,14 +375,13 @@ class CommentariesController extends Controller
             abort(404);
         }
 
-        // $html = (new Converter)->entryToHtml($entry);
-
-        // return $html;
-
         $file = (new Converter)->entryToHtmlPdf($entry);
 
         return response()
-            ->file($file)
+            ->file($file, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="'.$entry->slug.'.pdf"',
+            ])
             // ->download($file, "{$entry->slug}.pdf")
 ;
     }

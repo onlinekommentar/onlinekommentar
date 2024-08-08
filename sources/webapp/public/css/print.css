@@ -746,7 +746,7 @@ select {
 
 @page {
     size: A4;
-    margin: 15mm 15mm 25mm 15mm;
+    margin: 20mm;
     @bottom-right {
         content: counter(page) " / " counter(pages);
         vertical-align: top;
@@ -801,6 +801,12 @@ footnote {
         margin-top: 0.75rem;
     }
 
+.header-logo {
+        width: 60mm;
+        margin: 0 auto;
+        margin-bottom: 1.5rem;
+    }
+
 .header-label {
         text-transform: uppercase;
         font-size: 1.2rem;
@@ -831,6 +837,7 @@ footnote {
         }
 
 .legal-text {
+    margin-bottom: 1.5rem;
     background-color: #f4e8d7;
     padding: 5mm;
 }
@@ -839,14 +846,37 @@ footnote {
         margin-top: 0.75rem;
     }
 
-.toc a::after {
-        content: target-counter(attr(href), page);
+.toc {
+    page-break-before: always;
+    margin-bottom: 1.5rem;
+}
+
+.toc > * + * {
+        margin-top: 0.75rem;
     }
+
+.toc-label {
+        text-transform: uppercase;
+    }
+
+.toc-list ul ul {
+            margin-left: 1rem;
+        }
+
+.toc-list a {
+            display: flex;
+            justify-content: space-between;
+            gap: 0.5rem;
+        }
+
+.toc-list a::after {
+                content: target-counter(attr(href), page);
+            }
 
 /* Content */
 
 .content {
-    padding-left: 1.75rem;
+    page-break-before: always;
 }
 
 .content > * + * {
@@ -857,7 +887,7 @@ footnote {
         width: 1rem;
         text-align: right;
         position: absolute;
-        left: 0;
+        left: -1.75rem;
         font-size: 0.8rem;
         color: #707070;
         margin-top: 0.2rem;

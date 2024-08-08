@@ -13,6 +13,8 @@ use Textandbytes\Converter\Nodes\Footnote;
 use Tiptap\Editor;
 use Tiptap\Marks;
 use Tiptap\Nodes;
+use TOC\MarkupFixer;
+use TOC\TocGenerator;
 
 class Converter
 {
@@ -127,10 +129,20 @@ class Converter
 
     public function entryToHtml($entry)
     {
+        $markupFixer = new MarkupFixer();
+        $content = $markupFixer->fix($entry->content);
+
+        $tocGenerator = new TocGenerator();
+        $toc = $tocGenerator->getHtmlMenu($content);
+
         return (new View)
             ->template('commentaries.print')
             ->layout('print')
             ->cascadeContent($entry)
+            ->with([
+                'content' => $content,
+                'toc' => $toc,
+            ])
             ->render();
     }
 
