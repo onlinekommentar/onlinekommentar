@@ -751,7 +751,7 @@ select {
         content: counter(page) " / " counter(pages);
         vertical-align: top;
         padding-top: 5mm;
-        font-size: 8pt;
+        font-size: 0.8rem;
     }
 }
 
@@ -760,6 +760,14 @@ html {
     font-family: librecaslon, serif;
     line-height: 1.5;
 }
+
+html.text-md {
+        font-size: 10pt;
+    }
+
+html.text-lg {
+        font-size: 12pt;
+    }
 
 /* Footnotes */
 

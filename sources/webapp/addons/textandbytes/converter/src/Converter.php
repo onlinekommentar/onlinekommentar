@@ -127,7 +127,7 @@ class Converter
         return $pdfFile;
     }
 
-    public function entryToHtml($entry)
+    public function entryToHtml($entry, $params = [])
     {
         $markupFixer = new MarkupFixer();
         $content = $markupFixer->fix($entry->content);
@@ -142,13 +142,14 @@ class Converter
             ->with([
                 'content' => $content,
                 'toc' => $toc,
+                ...$params,
             ])
             ->render();
     }
 
-    public function entryToHtmlPdf($entry)
+    public function entryToHtmlPdf($entry, $params = [])
     {
-        $html = $this->entryToHtml($entry);
+        $html = $this->entryToHtml($entry, $params);
 
         $pdfFile = storage_path('app').'/weasyprint-'.uniqid().'.pdf';
 

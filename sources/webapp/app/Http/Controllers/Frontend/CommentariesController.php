@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
 use Jfcherng\Diff\Differ;
@@ -359,7 +360,7 @@ class CommentariesController extends Controller
         return html_entity_decode($renderer->render($differ));
     }
 
-    public function print($locale, $commentarySlug)
+    public function print(Request $request, $locale, $commentarySlug)
     {
         $entry = Entry::query()
             ->where('collection', 'commentaries')
@@ -375,7 +376,9 @@ class CommentariesController extends Controller
             abort(404);
         }
 
-        $file = (new Converter)->entryToHtmlPdf($entry);
+        $file = (new Converter)->entryToHtmlPdf($entry, [
+            'text' => $request->text ?? 'md',
+        ]);
 
         return response()
             ->file($file, [
