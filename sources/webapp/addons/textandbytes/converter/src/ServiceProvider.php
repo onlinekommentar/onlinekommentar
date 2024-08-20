@@ -13,12 +13,12 @@ class ServiceProvider extends AddonServiceProvider
     protected $commands = [
         Commands\ImportDocuments::class,
     ];
-    
+
     protected $routes = [
-        'cp'  => __DIR__.'/../routes/cp.php',
+        'cp' => __DIR__.'/../routes/cp.php',
     ];
-    
+
     protected $scripts = [
-        __DIR__ . '/../dist/js/addon.js',
+        __DIR__.'/../dist/js/addon.js',
     ];
 }

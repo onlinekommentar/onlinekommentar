@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Frontend;
 
-use Storage;
-use Statamic\View\View;
-use Statamic\Facades\User;
-use Statamic\Facades\Entry;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
+use Statamic\Facades\Entry;
+use Statamic\Facades\User;
+use Statamic\View\View;
+use Storage;
 
 class UsersController extends Controller
 {
@@ -24,14 +24,14 @@ class UsersController extends Controller
         }
 
         // ensure that a valid users view exists based on the supplied segment
-        abort_if(!in_array($usersType, ['autoren', 'herausgeber']), 404);
+        abort_if(! in_array($usersType, ['autoren', 'herausgeber']), 404);
 
         // get the user with the given slug
         $user = User::query()
             ->where('slug', '=', $slug)
             ->first();
 
-        abort_if(!$user, 404);
+        abort_if(! $user, 404);
 
         // get the commentaries authored by the user
         $authoredCommentaries = $this->_getCommentariesAssignedToUser($locale, $user, 'assigned_authors');
@@ -49,19 +49,19 @@ class UsersController extends Controller
                 ->map(function ($legal_domain, $key) {
                     return [
                         'id' => $legal_domain->id,
-                        'label' => trans($legal_domain->title)
+                        'label' => trans($legal_domain->title),
                     ];
                 })
                 ->all(),
-            'title' => $user->  { 'professional_title_' . $locale },
-            'occupation' => $user->{ 'occupation_' . $locale },
-            'editor_of' => $user->{ 'editor_of_' . $locale },
+            'title' => $user->{ 'professional_title_'.$locale },
+            'occupation' => $user->{ 'occupation_'.$locale },
+            'editor_of' => $user->{ 'editor_of_'.$locale },
             'practice' => $user->practice,
             'linkedin_url' => $user->linkedin_url,
             'website_url' => $user->website_url,
-            'avatar' => $user->value('avatar') ? Storage::url('avatars/') . $user->value('avatar') : null,
-            'authored_commentaries' => !empty($authoredCommentaries) ? $authoredCommentaries : null,
-            'edited_commentaries' => !empty($editedCommentaries) ? $editedCommentaries : null
+            'avatar' => $user->value('avatar') ? Storage::url('avatars/').$user->value('avatar') : null,
+            'authored_commentaries' => ! empty($authoredCommentaries) ? $authoredCommentaries : null,
+            'edited_commentaries' => ! empty($editedCommentaries) ? $editedCommentaries : null,
         ];
 
         // load the user detail view
@@ -70,7 +70,7 @@ class UsersController extends Controller
             ->layout('layout')
             ->with(array_merge([
                 'locale' => $locale,
-                'base_path_prefix' => '/' . $locale . '/' . $usersType
+                'base_path_prefix' => '/'.$locale.'/'.$usersType,
             ], $userData))
             ->render();  // render the view to a string;
 

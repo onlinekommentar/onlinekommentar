@@ -22,7 +22,7 @@ class Revisions extends Tags
         $commentaryId = $this->params->get('id');
 
         // check that a revisions directory exists for the given commentary
-        $commentaryRevisionBasePath = config('statamic.revisions.path') . '/collections/commentaries/' . $locale . '/' . $commentaryId;
+        $commentaryRevisionBasePath = config('statamic.revisions.path').'/collections/commentaries/'.$locale.'/'.$commentaryId;
         if (File::exists($commentaryRevisionBasePath)) {
             // extract the timestamps from the list of revision files
             $revisionTimestamps = $this->_getFilenamesFromPath($commentaryRevisionBasePath, false);
@@ -37,7 +37,7 @@ class Revisions extends Tags
                 $previousRevisionHtml = $currentRevisionHtml;
 
                 // extract the structured data from 'content' field in the revision file
-                $revisionFile = $commentaryRevisionBasePath . '/' . $timestamp . '.yaml';
+                $revisionFile = $commentaryRevisionBasePath.'/'.$timestamp.'.yaml';
                 $revision = $yaml->parseFile($revisionFile);
 
                 if (array_key_exists('content', $revision['attributes']['data']) && $revision['attributes']['data']['content']) {
@@ -55,13 +55,13 @@ class Revisions extends Tags
                         $revisions[] = [
                             'unix_timestamp' => $timestamp,
                             'human_readable_timestamp' => $this->_getLocaleFormattedTimestamp($timestamp, $locale),
-                            'human_readable_timestamp_date_only' => $this->_getLocaleFormattedTimestampDateOnly($timestamp, $locale)
+                            'human_readable_timestamp_date_only' => $this->_getLocaleFormattedTimestampDateOnly($timestamp, $locale),
                         ];
                     }
                 }
             }
 
-            return !empty($revisions) ? array_reverse($revisions) : null;
+            return ! empty($revisions) ? array_reverse($revisions) : null;
         }
 
         return null;
@@ -84,13 +84,15 @@ class Revisions extends Tags
 
     private function _getLocaleFormattedTimestamp($timestamp, $locale)
     {
-        $format = ($locale === 'en' ? 'MM/DD/YYYY' : 'DD.MM.YYYY') . ' HH:mm:ss z';
+        $format = ($locale === 'en' ? 'MM/DD/YYYY' : 'DD.MM.YYYY').' HH:mm:ss z';
+
         return Carbon::createFromTimestamp($timestamp)->isoFormat($format);
     }
 
     private function _getLocaleFormattedTimestampDateOnly($timestamp, $locale)
     {
         $format = ($locale === 'en' ? 'MM/DD/YYYY' : 'DD.MM.YYYY');
+
         return Carbon::createFromTimestamp($timestamp)->isoFormat($format);
     }
 }

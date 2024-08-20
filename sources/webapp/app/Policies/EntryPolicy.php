@@ -37,8 +37,7 @@ class EntryPolicy
             $assigned_editors = $entry->assigned_editors->pluck('id')->toArray();
 
             return $user->toArray()['is_admin'] || (in_array($user->id, $assigned_editors) || in_array($user->id, $assigned_authors));
-        }
-        else {
+        } else {
             if ($this->hasAnotherAuthor($user, $entry)) {
                 return $user->hasPermission("edit other authors {$entry->collectionHandle()} entries");
             }

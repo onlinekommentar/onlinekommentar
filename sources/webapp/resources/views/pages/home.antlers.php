@@ -1,6 +1,6 @@
 <?php
 
-use Statamic\Facades\Entry; 
+use Statamic\Facades\Entry;
 
 // get the latest 3 commentaries that have valid content
 $commentaries = Entry::query()
@@ -10,38 +10,38 @@ $commentaries = Entry::query()
   ->orderBy('date', 'desc')
   ->get()
   ->map(function ($commentary, $key) {
-    if ($commentary['content'] !== null) {
-      return [
-        'id' => $commentary['id'],
-        'slug' => $commentary['slug'],
-        'title' => $commentary['title'],
-        'legal_domain' => Entry::query()
-            ->where('collection', 'legal_domains')
-            ->where('id', $commentary->value('legal_domain'))
-            ->get()
-            ->map(function ($legal_domain, $key) {
-                return [
-                  'id' => $legal_domain['id'],
-                  'label' => __($legal_domain['title'])
-                ];
-            })
-            ->first(),
-        'assigned_authors' => $commentary['assigned_authors']->map(function ($author, $key) {
-          return $author['name'];
-        })->toArray(),
-        'assigned_editors' => $commentary['assigned_editors']->map(function ($editor, $key) {
-          return $editor['name'];
-        })->toArray(),
-      ];
-    }
+      if ($commentary['content'] !== null) {
+          return [
+              'id' => $commentary['id'],
+              'slug' => $commentary['slug'],
+              'title' => $commentary['title'],
+              'legal_domain' => Entry::query()
+                  ->where('collection', 'legal_domains')
+                  ->where('id', $commentary->value('legal_domain'))
+                  ->get()
+                  ->map(function ($legal_domain, $key) {
+                      return [
+                          'id' => $legal_domain['id'],
+                          'label' => __($legal_domain['title']),
+                      ];
+                  })
+                  ->first(),
+              'assigned_authors' => $commentary['assigned_authors']->map(function ($author, $key) {
+                  return $author['name'];
+              })->toArray(),
+              'assigned_editors' => $commentary['assigned_editors']->map(function ($editor, $key) {
+                  return $editor['name'];
+              })->toArray(),
+          ];
+      }
   })
   ->toArray();
 
-  // remove null values that occur for commentary entries with no content
-  // reset the array index values to return an indexed array instead of an associative array
-  $numberOfCommentariesToDisplay = 3;
-  $commentaries = array_values(array_slice(array_filter($commentaries), 0, $numberOfCommentariesToDisplay));
- 
+// remove null values that occur for commentary entries with no content
+// reset the array index values to return an indexed array instead of an associative array
+$numberOfCommentariesToDisplay = 3;
+$commentaries = array_values(array_slice(array_filter($commentaries), 0, $numberOfCommentariesToDisplay));
+
 ?>
 
 <div class="max-w-3xl mx-auto mb-auto mt-8 p-6">
