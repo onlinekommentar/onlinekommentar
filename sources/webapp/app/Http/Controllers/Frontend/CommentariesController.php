@@ -36,7 +36,7 @@ class CommentariesController extends Controller
 
         // Handle Live Preview in CP
         if ($isLivePreview) {
-            $livePreview = new LivePreview();
+            $livePreview = new LivePreview;
             $commentaryData = $livePreview->item(app()->request->statamicToken());
             $commentaryData = $commentaryData->toArray();
         }
@@ -98,14 +98,14 @@ class CommentariesController extends Controller
         // add anchor attributes to the heading elements
         $contentMarkup = null;
         if ($content) {
-            $markupFixer = new MarkupFixer();
+            $markupFixer = new MarkupFixer;
             $contentMarkup = $markupFixer->fix($content);
         }
 
         // generate table of contents from the heading elements
         $toc = null;
         if ($contentMarkup) {
-            $tocGenerator = new TocGenerator();
+            $tocGenerator = new TocGenerator;
             $toc = $tocGenerator->getHtmlMenu($contentMarkup);
         }
 
@@ -246,13 +246,13 @@ class CommentariesController extends Controller
         $revisionData['slug'] = $revision['attributes']['slug'];
 
         // convert the structured data from the 'content' and 'legal_text' fields into html
-        $modifiers = new CoreModifiers();
+        $modifiers = new CoreModifiers;
         $revisionData['content'] = $modifiers->bardHtml($revisionData['content']);
         $revisionData['legal_text'] = $modifiers->bardHtml($revisionData['legal_text']);
 
         // add anchor attributes to the heading elements
         if ($revisionData['content']) {
-            $markupFixer = new MarkupFixer();
+            $markupFixer = new MarkupFixer;
             $revisionData['content'] = $markupFixer->fix($revisionData['content']);
         }
 
@@ -272,7 +272,7 @@ class CommentariesController extends Controller
         $revision = $yaml->parseFile($revisionFile);
 
         // convert the structured data from the 'content' field into html
-        $modifiers = new CoreModifiers();
+        $modifiers = new CoreModifiers;
         $revisionHtmlContent = $modifiers->bardHtml($revision['attributes']['data']['content']);
 
         return [
@@ -362,6 +362,19 @@ class CommentariesController extends Controller
 
     public function print(Request $request, $locale, $commentarySlug)
     {
+        $cacheKey = "commentary_print:{$locale}:{$commentarySlug}";
+        if (config('app.env') !== 'local' && Cache::has($cacheKey)) {
+            $file = Cache::get($cacheKey);
+
+            return response()
+                ->file($file, [
+                    'Content-Type' => 'application/pdf',
+                    'Content-Disposition' => 'inline; filename="'.$commentarySlug.'.pdf"',
+                ]);
+        }
+
+        app()->setLocale($locale);
+
         $entry = Entry::query()
             ->where('collection', 'commentaries')
             ->where('locale', $locale)
@@ -376,16 +389,22 @@ class CommentariesController extends Controller
             abort(404);
         }
 
+        // return (new Converter)->entryToHtml($entry, [
+        //     'text' => $request->text ?? 'md',
+        // ]);
+
         $file = (new Converter)->entryToHtmlPdf($entry, [
             'text' => $request->text ?? 'md',
         ]);
 
+        if (config('app.env') !== 'local') {
+            Cache::put($cacheKey, $file, now()->addDays(7));
+        }
+
         return response()
             ->file($file, [
                 'Content-Type' => 'application/pdf',
-                'Content-Disposition' => 'inline; filename="'.$entry->slug.'.pdf"',
-            ])
-            // ->download($file, "{$entry->slug}.pdf")
-;
+                'Content-Disposition' => 'inline; filename="'.$commentarySlug.'.pdf"',
+            ]);
     }
 }

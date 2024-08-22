@@ -133,6 +133,9 @@ footnote {
     > * + * {
         margin-top: 0.75rem;
     }
+    p {
+        text-align: justify;
+    }
     .paragraph-nr {
         width: 1rem;
         text-align: right;
