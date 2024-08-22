@@ -45,7 +45,12 @@ class Footnote extends Node
             ],
         ]);
 
-        $nodes = $editor->setContent($html)->getDocument()['content'][0]['content'];
+        $nodes = $editor->setContent($html)->getDocument();
+        if (! isset($nodes['content'][0]['content'])) {
+            return [];
+        }
+
+        $nodes = $nodes['content'][0]['content'];
 
         return json_decode(json_encode($nodes));
     }
