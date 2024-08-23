@@ -32,36 +32,36 @@ class Converter
 
         $data = (new Editor([
             'extensions' => [
-                new Marks\Bold(),
-                new Marks\Italic(),
-                new Marks\Link(),
-                new Marks\Superscript(),
-                new Marks\Underline(),
-                new Nodes\BulletList(),
-                new Nodes\HardBreak(),
-                new Nodes\Heading(),
-                new Nodes\ListItem(),
-                new Nodes\OrderedList(),
-                new Nodes\Paragraph(),
-                new Nodes\Document(),
-                new Nodes\Text(),
-                new Cleaner(),
-                new Footnote(),
-                new ParagraphNumber(),
+                new Marks\Bold,
+                new Marks\Italic,
+                new Marks\Link,
+                new Marks\Superscript,
+                new Marks\Underline,
+                new Nodes\BulletList,
+                new Nodes\HardBreak,
+                new Nodes\Heading,
+                new Nodes\ListItem,
+                new Nodes\OrderedList,
+                new Nodes\Paragraph,
+                new Nodes\Document,
+                new Nodes\Text,
+                new Cleaner,
+                new Footnote,
+                new ParagraphNumber,
             ],
         ]))->setContent($html)->getDocument()['content'];
 
         $data = Cleaner::postConvert($data);
 
-        return json_encode($data);
+        return $data;
     }
 
-    public function prosemirrorToWord($data)
-    {
-        $data = json_decode($data);
+    // public function prosemirrorToWord($data)
+    // {
+    //     $data = json_decode($data);
 
-        return (new WordRenderer)->render($data);
-    }
+    //     return (new WordRenderer)->render($data);
+    // }
 
     public function entryToWord($entry)
     {
@@ -129,10 +129,10 @@ class Converter
 
     public function entryToHtml($entry, $params = [])
     {
-        $markupFixer = new MarkupFixer();
+        $markupFixer = new MarkupFixer;
         $content = $markupFixer->fix($entry->content);
 
-        $tocGenerator = new TocGenerator();
+        $tocGenerator = new TocGenerator;
         $toc = $tocGenerator->getHtmlMenu($content);
 
         return (new View)

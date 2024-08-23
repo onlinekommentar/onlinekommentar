@@ -80,20 +80,20 @@ export default {
             })
         },
 
-        convertProsemirrorToWord() {
-            this.converting = true;
-            this.$progress.start('convert' + this._uid);
-            this.$axios.post(cp_url('converter/prosemirror-word'), {
-                id: this.store.values.id,
-                data: this.store.values.content,
-            }, { responseType: 'blob' }).then(response => {
-                this.downloadFile(response);
-            }).catch(e => {
-            }).finally(e => {
-                this.converting = false;
-                this.$progress.complete('convert' + this._uid);
-            })
-        },
+        // convertProsemirrorToWord() {
+        //     this.converting = true;
+        //     this.$progress.start('convert' + this._uid);
+        //     this.$axios.post(cp_url('converter/prosemirror-word'), {
+        //         id: this.store.values.id,
+        //         data: this.store.values.content,
+        //     }, { responseType: 'blob' }).then(response => {
+        //         this.downloadFile(response);
+        //     }).catch(e => {
+        //     }).finally(e => {
+        //         this.converting = false;
+        //         this.$progress.complete('convert' + this._uid);
+        //     })
+        // },
 
         convertEntryToWord() {
             this.converting = true;

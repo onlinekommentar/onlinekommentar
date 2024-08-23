@@ -12,15 +12,15 @@ Route::post('converter/html-prosemirror', function (Request $request) {
     return ['data' => $data];
 });
 
-Route::post('converter/prosemirror-word', function (Request $request) {
-    $values = $request->json()->all();
-    $entry = Entry::find($values['id']);
-    $file = (new Converter)->prosemirrorToWord($values['data']);
+// Route::post('converter/prosemirror-word', function (Request $request) {
+//     $values = $request->json()->all();
+//     $entry = Entry::find($values['id']);
+//     $file = (new Converter)->prosemirrorToWord($values['data']);
 
-    return response()
-        ->download($file, "{$entry->slug}.docx")
-        ->deleteFileAfterSend(true);
-});
+//     return response()
+//         ->download($file, "{$entry->slug}.docx")
+//         ->deleteFileAfterSend(true);
+// });
 
 Route::post('converter/entry-word', function (Request $request) {
     $values = $request->json()->all();
@@ -35,7 +35,7 @@ Route::post('converter/entry-word', function (Request $request) {
 Route::post('converter/entry-pdf', function (Request $request) {
     $values = $request->json()->all();
     $entry = Entry::find($values['id']);
-    $file = (new Converter)->entryToPdf($entry);
+    $file = (new Converter)->entryToHtmlPdf($entry);
 
     return response()
         ->download($file, "{$entry->slug}.pdf")
