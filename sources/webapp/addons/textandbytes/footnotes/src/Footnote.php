@@ -2,6 +2,7 @@
 
 namespace Textandbytes\Footnotes;
 
+use Statamic\Support\Str;
 use Tiptap\Core\Node;
 
 class Footnote extends Node
@@ -24,7 +25,7 @@ class Footnote extends Node
 
     public function renderHTML($node, $HTMLAttributes = [])
     {
-        $content = $node->attrs->{'data-content'} ?? null;
+        $content = Str::stripTags($node->attrs->{'data-content'} ?? null, ['p']);
 
         return ['content' => '<footnote data-content="'.e($content).'">'.$content.'</footnote>'];
     }
