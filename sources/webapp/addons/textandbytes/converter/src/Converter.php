@@ -154,6 +154,7 @@ class Converter
         $pdfFile = storage_path('app').'/weasyprint-'.uniqid().'.pdf';
 
         $pdf = new Pdf(config('services.weasyprint.bin'));
+        $pdf->setTimeout(30);
         $pdf->generateFromHtml($html, $pdfFile);
 
         return $pdfFile;

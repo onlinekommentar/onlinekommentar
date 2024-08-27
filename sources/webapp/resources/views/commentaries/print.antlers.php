@@ -7,8 +7,8 @@
         {{ title }}
     </h1>
     <p class="header-authors">
-        {{ trans:commentary_by }} {{ assigned_authors | pluck('name') | join(', ') }}<br>
-        {{ trans:edited_by }} {{ assigned_editors | pluck('name') | join(', ') }}
+        {{ trans:commentary_by }} {{ assigned_authors | pluck('name') | join(' / ') }}<br>
+        {{ trans:edited_by }} {{ assigned_editors | pluck('name') | join(' / ') }}
     </p>
 </header>
 <section class="citation">
