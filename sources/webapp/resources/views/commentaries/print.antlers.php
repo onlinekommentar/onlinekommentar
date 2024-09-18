@@ -1,5 +1,10 @@
 <header class="header">
     <img src="{{ config:app:url }}/img/ok-logo-text_{{ locale }}.svg" class="header-logo">
+    {{ if original_language:handle && original_language:handle !== locale }}
+        <div class="header-translation">
+            {{ trans:is_translated original_language="{ trans :key="original_language:handle" }" }}
+        </div>
+    {{ /if }}
     <p class="header-label">
         {{ trans:commentary_on }}
     </p>

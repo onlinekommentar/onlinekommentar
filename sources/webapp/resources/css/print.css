@@ -63,6 +63,15 @@ footnote {
     > * + * {
         margin-top: 0.75rem;
     }
+    &-translation {
+        padding: 5mm;
+        margin: 0 auto;
+        margin-bottom: 1.5rem;
+        font-size: 0.85rem;
+        color: #ffffff;
+        background-color: #E06C56;
+        text-align: left;
+    }
     &-logo {
         width: 60mm;
         margin: 0 auto;

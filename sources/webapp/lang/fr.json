@@ -80,7 +80,7 @@
     "back_to_results": "Retourner aux résultats",
 
     "suggested_citation": "Proposition de citation",
-    "short_citation": "Brève citation",
+    "short_citation": "Citation abregée",
     "copy_citation": "Copier",
     "copied_citation": "Copié",
     "copy_citation_error": "Erreur",
@@ -100,14 +100,14 @@
 
     "commentary_on": "Commentaire",
 
-    "table_of_contents": "Table de matières",
+    "table_of_contents": "Table des matières",
 
     "sidebar_handle_text": "Navigation",
 
     "version": "Version",
     "compare": "Comparer",
     "compare_versions": "Comparer les versions",
-    "ATTENTION: This version of the commentary is an automatic machine translation of the original. The original version is in :original_language. The translation was done with www.deepl.com. Only the original version is authoritative. The translated form of the commentary cannot be cited.": "ATTENTION : Cette version du commentaire est une traduction automatique de l’original. Le commentaire original est en :original_language. La traduction a été faite avec www.deepl.com. Seule la version originale fait foi. La version traduite du commentaire ne peut pas être citée.",
+    "is_translated": "ATTENTION : Cette version du commentaire est une traduction automatique de l’original. Le commentaire original est en :original_language. La traduction a été faite avec www.deepl.com. Seule la version originale fait foi. La version traduite du commentaire ne peut pas être citée.",
 
     "visited_at": "visité le",
 

@@ -49,7 +49,7 @@
 
       <div class="flex flex-col items-center my-8 space-y-6 md:my-12">
         <div v-if="commentary.original_language && (commentary.original_language !== commentary.locale)" class="p-4 text-sm font-medium text-white bg-ok-red">
-          {{ $t("ATTENTION: This version of the commentary is an automatic machine translation of the original. The original version is in :original_language. The translation was done with www.deepl.com. Only the original version is authoritative. The translated form of the commentary cannot be cited.", { original_language: $t(commentary.original_language) }) }}
+          {{ $t("is_translated", { original_language: $t(commentary.original_language) }) }}
         </div>
 
         <div class="font-sans text-xs tracking-widest uppercase">

@@ -4,6 +4,7 @@ namespace Textandbytes\Converter;
 
 use Gotenberg\Gotenberg;
 use Gotenberg\Stream;
+use Illuminate\Support\Traits\Localizable;
 use Pontedilana\PhpWeasyPrint\Pdf;
 use Statamic\Support\Str;
 use Statamic\View\View;
@@ -18,6 +19,8 @@ use TOC\TocGenerator;
 
 class Converter
 {
+    use Localizable;
+
     public function htmlToProsemirror($html)
     {
         /* ProseMirror input must be UTF-8. Samples coming from tests will be
@@ -135,7 +138,7 @@ class Converter
         $tocGenerator = new TocGenerator;
         $toc = $tocGenerator->getHtmlMenu($content);
 
-        return (new View)
+        return $this->withLocale($entry->locale(), fn () => (new View)
             ->template('commentaries.print')
             ->layout('print')
             ->cascadeContent($entry)
@@ -144,7 +147,7 @@ class Converter
                 'toc' => $toc,
                 ...$params,
             ])
-            ->render();
+            ->render());
     }
 
     public function entryToHtmlPdf($entry, $params = [])
