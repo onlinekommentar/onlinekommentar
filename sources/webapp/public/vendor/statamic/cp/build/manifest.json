@@ -1,6 +1,6 @@
 {
   "resources/css/tailwind.css": {
-    "file": "assets/tailwind-cc431037.css",
+    "file": "assets/tailwind-59af35c9.css",
     "isEntry": true,
     "src": "resources/css/tailwind.css"
   },
@@ -25,12 +25,12 @@
     "src": "resources/img/favicon.ico"
   },
   "resources/js/app.css": {
-    "file": "assets/app-76766870.css",
+    "file": "assets/app-3c9f2f01.css",
     "src": "resources/js/app.css"
   },
   "resources/js/app.js": {
     "css": [
-      "assets/app-76766870.css"
+      "assets/app-3c9f2f01.css"
     ],
     "dynamicImports": [
       "resources/svg/icons/light/add-circle.svg",
@@ -65,6 +65,7 @@
       "resources/svg/icons/light/content-writing.svg",
       "resources/svg/icons/light/crane.svg",
       "resources/svg/icons/light/date.svg",
+      "resources/svg/icons/light/dictionary.svg",
       "resources/svg/icons/light/download.svg",
       "resources/svg/icons/light/drag-dots.svg",
       "resources/svg/icons/light/drawer-file.svg",
@@ -125,6 +126,7 @@
       "resources/svg/icons/light/seo-search-graph.svg",
       "resources/svg/icons/light/settings-horizontal.svg",
       "resources/svg/icons/light/settings-slider.svg",
+      "resources/svg/icons/light/settings.svg",
       "resources/svg/icons/light/shield-key.svg",
       "resources/svg/icons/light/shrink.svg",
       "resources/svg/icons/light/sites.svg",
@@ -384,6 +386,7 @@
       "resources/svg/icons/regular/info-circle.svg",
       "resources/svg/icons/regular/insert-image.svg",
       "resources/svg/icons/regular/insert-link.svg",
+      "resources/svg/icons/regular/light-mode.svg",
       "resources/svg/icons/regular/list-ol.svg",
       "resources/svg/icons/regular/list-ul-2.svg",
       "resources/svg/icons/regular/list-ul.svg",
@@ -402,6 +405,8 @@
       "resources/svg/icons/regular/performance-increase.svg",
       "resources/svg/icons/regular/pulse.svg",
       "resources/svg/icons/regular/quote.svg",
+      "resources/svg/icons/regular/radio-deselected.svg",
+      "resources/svg/icons/regular/radio-selected.svg",
       "resources/svg/icons/regular/relationship.svg",
       "resources/svg/icons/regular/rename-file.svg",
       "resources/svg/icons/regular/sd-card.svg",
@@ -416,6 +421,7 @@
       "resources/svg/icons/regular/superscript.svg",
       "resources/svg/icons/regular/swap.svg",
       "resources/svg/icons/regular/syringe.svg",
+      "resources/svg/icons/regular/system.svg",
       "resources/svg/icons/regular/telescope.svg",
       "resources/svg/icons/regular/text-bold.svg",
       "resources/svg/icons/regular/text-italic.svg",
@@ -460,6 +466,7 @@
       "resources/svg/icons/light/content-writing.svg",
       "resources/svg/icons/light/crane.svg",
       "resources/svg/icons/light/date.svg",
+      "resources/svg/icons/light/dictionary.svg",
       "resources/svg/icons/light/download.svg",
       "resources/svg/icons/light/drag-dots.svg",
       "resources/svg/icons/light/drawer-file.svg",
@@ -520,6 +527,7 @@
       "resources/svg/icons/light/seo-search-graph.svg",
       "resources/svg/icons/light/settings-horizontal.svg",
       "resources/svg/icons/light/settings-slider.svg",
+      "resources/svg/icons/light/settings.svg",
       "resources/svg/icons/light/shield-key.svg",
       "resources/svg/icons/light/shrink.svg",
       "resources/svg/icons/light/sites.svg",
@@ -779,6 +787,7 @@
       "resources/svg/icons/regular/info-circle.svg",
       "resources/svg/icons/regular/insert-image.svg",
       "resources/svg/icons/regular/insert-link.svg",
+      "resources/svg/icons/regular/light-mode.svg",
       "resources/svg/icons/regular/list-ol.svg",
       "resources/svg/icons/regular/list-ul-2.svg",
       "resources/svg/icons/regular/list-ul.svg",
@@ -797,6 +806,8 @@
       "resources/svg/icons/regular/performance-increase.svg",
       "resources/svg/icons/regular/pulse.svg",
       "resources/svg/icons/regular/quote.svg",
+      "resources/svg/icons/regular/radio-deselected.svg",
+      "resources/svg/icons/regular/radio-selected.svg",
       "resources/svg/icons/regular/relationship.svg",
       "resources/svg/icons/regular/rename-file.svg",
       "resources/svg/icons/regular/sd-card.svg",
@@ -811,6 +822,7 @@
       "resources/svg/icons/regular/superscript.svg",
       "resources/svg/icons/regular/swap.svg",
       "resources/svg/icons/regular/syringe.svg",
+      "resources/svg/icons/regular/system.svg",
       "resources/svg/icons/regular/telescope.svg",
       "resources/svg/icons/regular/text-bold.svg",
       "resources/svg/icons/regular/text-italic.svg",
@@ -839,7 +851,7 @@
       "resources/svg/filetypes/video.svg",
       "resources/svg/filetypes/xml.svg"
     ],
-    "file": "assets/app-da4fcfc7.js",
+    "file": "assets/app-4fb7000f.js",
     "isEntry": true,
     "src": "resources/js/app.js"
   },
@@ -1049,7 +1061,7 @@
     "src": "resources/svg/icons/light/collection.svg"
   },
   "resources/svg/icons/light/collections.svg": {
-    "file": "assets/collections-8a75769e.js",
+    "file": "assets/collections-6e6967ab.js",
     "isDynamicEntry": true,
     "src": "resources/svg/icons/light/collections.svg"
   },
@@ -1072,6 +1084,11 @@
     "file": "assets/date-6fddfc69.js",
     "isDynamicEntry": true,
     "src": "resources/svg/icons/light/date.svg"
+  },
+  "resources/svg/icons/light/dictionary.svg": {
+    "file": "assets/dictionary-b8229bb2.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/dictionary.svg"
   },
   "resources/svg/icons/light/download.svg": {
     "file": "assets/download-13d1cb2c.js",
@@ -1164,7 +1181,7 @@
     "src": "resources/svg/icons/light/flag.svg"
   },
   "resources/svg/icons/light/float.svg": {
-    "file": "assets/float-34e69af5.js",
+    "file": "assets/float-1677f349.js",
     "isDynamicEntry": true,
     "src": "resources/svg/icons/light/float.svg"
   },
@@ -1244,7 +1261,7 @@
     "src": "resources/svg/icons/light/licensing.svg"
   },
   "resources/svg/icons/light/link.svg": {
-    "file": "assets/link-41d2a49a.js",
+    "file": "assets/link-07bdb6d1.js",
     "isDynamicEntry": true,
     "src": "resources/svg/icons/light/link.svg"
   },
@@ -1284,7 +1301,7 @@
     "src": "resources/svg/icons/light/nav-preferences.svg"
   },
   "resources/svg/icons/light/partial.svg": {
-    "file": "assets/partial-7ee21f4d.js",
+    "file": "assets/partial-94971ad0.js",
     "isDynamicEntry": true,
     "src": "resources/svg/icons/light/partial.svg"
   },
@@ -1364,7 +1381,7 @@
     "src": "resources/svg/icons/light/seo-search-graph.svg"
   },
   "resources/svg/icons/light/settings-horizontal.svg": {
-    "file": "assets/settings-horizontal-3edf72b5.js",
+    "file": "assets/settings-horizontal-507fbc32.js",
     "isDynamicEntry": true,
     "src": "resources/svg/icons/light/settings-horizontal.svg"
   },
@@ -1372,6 +1389,11 @@
     "file": "assets/settings-slider-d0056519.js",
     "isDynamicEntry": true,
     "src": "resources/svg/icons/light/settings-slider.svg"
+  },
+  "resources/svg/icons/light/settings.svg": {
+    "file": "assets/settings-57e1db31.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/settings.svg"
   },
   "resources/svg/icons/light/shield-key.svg": {
     "file": "assets/shield-key-969a463d.js",
@@ -1419,7 +1441,7 @@
     "src": "resources/svg/icons/light/taxonomies.svg"
   },
   "resources/svg/icons/light/taxonomy.svg": {
-    "file": "assets/taxonomy-04bcd2b1.js",
+    "file": "assets/taxonomy-a9ca4c2e.js",
     "isDynamicEntry": true,
     "src": "resources/svg/icons/light/taxonomy.svg"
   },
@@ -1449,7 +1471,7 @@
     "src": "resources/svg/icons/light/title.svg"
   },
   "resources/svg/icons/light/toggle.svg": {
-    "file": "assets/toggle-7b4d5c81.js",
+    "file": "assets/toggle-3bae8661.js",
     "isDynamicEntry": true,
     "src": "resources/svg/icons/light/toggle.svg"
   },
@@ -2484,7 +2506,7 @@
     "src": "resources/svg/icons/regular/combine-cells.svg"
   },
   "resources/svg/icons/regular/dark-mode.svg": {
-    "file": "assets/dark-mode-0a6b304a.js",
+    "file": "assets/dark-mode-23b1473a.js",
     "isDynamicEntry": true,
     "src": "resources/svg/icons/regular/dark-mode.svg"
   },
@@ -2589,7 +2611,7 @@
     "src": "resources/svg/icons/regular/folder.svg"
   },
   "resources/svg/icons/regular/generic-field.svg": {
-    "file": "assets/generic-field-041004aa.js",
+    "file": "assets/generic-field-e69e9265.js",
     "isDynamicEntry": true,
     "src": "resources/svg/icons/regular/generic-field.svg"
   },
@@ -2668,6 +2690,11 @@
     "isDynamicEntry": true,
     "src": "resources/svg/icons/regular/insert-link.svg"
   },
+  "resources/svg/icons/regular/light-mode.svg": {
+    "file": "assets/light-mode-db4e6a04.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/light-mode.svg"
+  },
   "resources/svg/icons/regular/list-ol.svg": {
     "file": "assets/list-ol-c88bac13.js",
     "isDynamicEntry": true,
@@ -2699,12 +2726,12 @@
     "src": "resources/svg/icons/regular/new-window.svg"
   },
   "resources/svg/icons/regular/nova.svg": {
-    "file": "assets/nova-a1932ffa.js",
+    "file": "assets/nova-a13a1c24.js",
     "isDynamicEntry": true,
     "src": "resources/svg/icons/regular/nova.svg"
   },
   "resources/svg/icons/regular/pages.svg": {
-    "file": "assets/pages-c78dfe4a.js",
+    "file": "assets/pages-9a7c5ae2.js",
     "isDynamicEntry": true,
     "src": "resources/svg/icons/regular/pages.svg"
   },
@@ -2758,6 +2785,16 @@
     "isDynamicEntry": true,
     "src": "resources/svg/icons/regular/quote.svg"
   },
+  "resources/svg/icons/regular/radio-deselected.svg": {
+    "file": "assets/radio-deselected-4c748b55.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/radio-deselected.svg"
+  },
+  "resources/svg/icons/regular/radio-selected.svg": {
+    "file": "assets/radio-selected-9639aafa.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/radio-selected.svg"
+  },
   "resources/svg/icons/regular/relationship.svg": {
     "file": "assets/relationship-6143ceff.js",
     "isDynamicEntry": true,
@@ -2809,7 +2846,7 @@
     "src": "resources/svg/icons/regular/subtract.svg"
   },
   "resources/svg/icons/regular/suggest.svg": {
-    "file": "assets/suggest-a6770314.js",
+    "file": "assets/suggest-cc137454.js",
     "isDynamicEntry": true,
     "src": "resources/svg/icons/regular/suggest.svg"
   },
@@ -2827,6 +2864,11 @@
     "file": "assets/syringe-39cac2b4.js",
     "isDynamicEntry": true,
     "src": "resources/svg/icons/regular/syringe.svg"
+  },
+  "resources/svg/icons/regular/system.svg": {
+    "file": "assets/system-267f57ce.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/regular/system.svg"
   },
   "resources/svg/icons/regular/telescope.svg": {
     "file": "assets/telescope-3e0f8434.js",
@@ -2859,7 +2901,7 @@
     "src": "resources/svg/icons/regular/text-underline.svg"
   },
   "resources/svg/icons/regular/theme.svg": {
-    "file": "assets/theme-6e526819.js",
+    "file": "assets/theme-52bbae73.js",
     "isDynamicEntry": true,
     "src": "resources/svg/icons/regular/theme.svg"
   },

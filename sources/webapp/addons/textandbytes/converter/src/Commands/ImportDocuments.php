@@ -2,9 +2,9 @@
 
 namespace Textandbytes\Converter\Commands;
 
-use Textandbytes\Converter\Converter;
 use Illuminate\Console\Command;
 use Statamic\Facades\Entry;
+use Textandbytes\Converter\Converter;
 
 class ImportDocuments extends Command
 {
@@ -31,7 +31,6 @@ class ImportDocuments extends Command
 
         // Loop over the documents
         foreach ($documents as $document) {
-
             // Get the name of the file and convert it to ProseMirror
             $name = pathinfo($document, PATHINFO_FILENAME);
             $text = (new Converter)->convert(file_get_contents($document));

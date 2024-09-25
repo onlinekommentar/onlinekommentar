@@ -48,6 +48,12 @@ return [
         'entries' => [
             'class' => Stores\EntriesStore::class,
             'directory' => base_path('data/content/collections'),
+            'indexes' => [
+                'locale',
+                'status',
+                'assigned_authors',
+                'assigned_editors',
+            ],
         ],
 
         'navigation' => [
