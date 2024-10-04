@@ -80,6 +80,27 @@ class CommentariesController extends Controller
             }
         }
 
+        if ($commentaryData['blueprint']['handle'] !== 'commentary') {
+            // load the commentary detail view
+            $view = (new View)
+                ->template('commentaries/group')
+                ->layout('layout')
+                ->with(array_merge([
+                    'locale' => $locale,
+                    'versionTimestamp' => $versionTimestamp,
+                    'versionComparisonResult' => $versionComparisonResult,
+                    'base_path_prefix' => '/'.$locale.'/',
+                ], $commentaryData))
+                ->render();  // render the view to a string
+
+            // Cache the generated view for 7 days
+            if (config('app.env') !== 'local' && ! $isLivePreview) {
+                Cache::put($cacheKey, $view, now()->addDays(7));
+            }
+
+            return $view;
+        }
+
         // get the assigned authors and editors from their ids
         $commentaryData['assigned_authors'] = $this->_getUsers($commentaryData['assigned_authors'] ?? null, ['id', 'slug', 'name']);
         $commentaryData['assigned_editors'] = $this->_getUsers($commentaryData['assigned_editors'] ?? null, ['id', 'slug', 'name']);
@@ -109,12 +130,9 @@ class CommentariesController extends Controller
             $toc = $tocGenerator->getHtmlMenu($contentMarkup);
         }
 
-        // select the legal domain or show template depending on commentary content
-        $template = $commentaryData['content'] ? 'commentaries/show' : 'commentaries/legal-domain';
-
         // load the commentary detail view
         $view = (new View)
-            ->template($template)
+            ->template('commentaries/show')
             ->layout('layout')
             ->with(array_merge([
                 'locale' => $locale,

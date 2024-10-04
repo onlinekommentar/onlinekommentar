@@ -57,13 +57,26 @@ __webpack_require__.r(__webpack_exports__);
         _this2.$refs.input.value = null;
       });
     },
-    convertProsemirrorToWord: function convertProsemirrorToWord() {
+    // convertProsemirrorToWord() {
+    //     this.converting = true;
+    //     this.$progress.start('convert' + this._uid);
+    //     this.$axios.post(cp_url('converter/prosemirror-word'), {
+    //         id: this.store.values.id,
+    //         data: this.store.values.content,
+    //     }, { responseType: 'blob' }).then(response => {
+    //         this.downloadFile(response);
+    //     }).catch(e => {
+    //     }).finally(e => {
+    //         this.converting = false;
+    //         this.$progress.complete('convert' + this._uid);
+    //     })
+    // },
+    convertEntryToWord: function convertEntryToWord() {
       var _this3 = this;
       this.converting = true;
       this.$progress.start('convert' + this._uid);
-      this.$axios.post(cp_url('converter/prosemirror-word'), {
-        id: this.store.values.id,
-        data: this.store.values.content
+      this.$axios.post(cp_url("converter/entry-word"), {
+        id: this.store.values.id
       }, {
         responseType: 'blob'
       }).then(function (response) {
@@ -73,11 +86,11 @@ __webpack_require__.r(__webpack_exports__);
         _this3.$progress.complete('convert' + _this3._uid);
       });
     },
-    convertEntryToWord: function convertEntryToWord() {
+    convertEntryToPdf: function convertEntryToPdf() {
       var _this4 = this;
       this.converting = true;
       this.$progress.start('convert' + this._uid);
-      this.$axios.post(cp_url("converter/entry-word"), {
+      this.$axios.post(cp_url("converter/entry-pdf"), {
         id: this.store.values.id
       }, {
         responseType: 'blob'
@@ -86,21 +99,6 @@ __webpack_require__.r(__webpack_exports__);
       })["catch"](function (e) {})["finally"](function (e) {
         _this4.converting = false;
         _this4.$progress.complete('convert' + _this4._uid);
-      });
-    },
-    convertEntryToPdf: function convertEntryToPdf() {
-      var _this5 = this;
-      this.converting = true;
-      this.$progress.start('convert' + this._uid);
-      this.$axios.post(cp_url("converter/entry-pdf"), {
-        id: this.store.values.id
-      }, {
-        responseType: 'blob'
-      }).then(function (response) {
-        _this5.downloadFile(response);
-      })["catch"](function (e) {})["finally"](function (e) {
-        _this5.converting = false;
-        _this5.$progress.complete('convert' + _this5._uid);
       });
     },
     downloadFile: function downloadFile(response) {

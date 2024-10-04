@@ -132,7 +132,7 @@ class UsersData extends ViewModel
         $legalDomains = array_values(array_unique(array_filter(call_user_func_array('array_merge', array_column($users, 'legal_domains'))), SORT_REGULAR));
 
         // prepend an option to display all legal domains
-        array_unshift($legalDomains, ['id' => null, 'label' => __('legal_domain_filter_label').': '.__('legal_domain_filter_all')]);
+        array_unshift($legalDomains, ['id' => null, 'label' => __('legal_domain_filter_label').': '.__('filter_all')]);
 
         return $legalDomains;
     }

@@ -1,6 +1,6 @@
 {
   "resources/css/tailwind.css": {
-    "file": "assets/tailwind-59af35c9.css",
+    "file": "assets/tailwind-220bf74b.css",
     "isEntry": true,
     "src": "resources/css/tailwind.css"
   },
@@ -25,12 +25,12 @@
     "src": "resources/img/favicon.ico"
   },
   "resources/js/app.css": {
-    "file": "assets/app-3c9f2f01.css",
+    "file": "assets/app-8f6a57a3.css",
     "src": "resources/js/app.css"
   },
   "resources/js/app.js": {
     "css": [
-      "assets/app-3c9f2f01.css"
+      "assets/app-8f6a57a3.css"
     ],
     "dynamicImports": [
       "resources/svg/icons/light/add-circle.svg",
@@ -77,6 +77,7 @@
       "resources/svg/icons/light/expand-diagonal.svg",
       "resources/svg/icons/light/expand-vertical.svg",
       "resources/svg/icons/light/external-link.svg",
+      "resources/svg/icons/light/eye.svg",
       "resources/svg/icons/light/fieldsets.svg",
       "resources/svg/icons/light/fieldtype.svg",
       "resources/svg/icons/light/file-code.svg",
@@ -478,6 +479,7 @@
       "resources/svg/icons/light/expand-diagonal.svg",
       "resources/svg/icons/light/expand-vertical.svg",
       "resources/svg/icons/light/external-link.svg",
+      "resources/svg/icons/light/eye.svg",
       "resources/svg/icons/light/fieldsets.svg",
       "resources/svg/icons/light/fieldtype.svg",
       "resources/svg/icons/light/file-code.svg",
@@ -851,7 +853,7 @@
       "resources/svg/filetypes/video.svg",
       "resources/svg/filetypes/xml.svg"
     ],
-    "file": "assets/app-4fb7000f.js",
+    "file": "assets/app-729d12e9.js",
     "isEntry": true,
     "src": "resources/js/app.js"
   },
@@ -1144,6 +1146,11 @@
     "file": "assets/external-link-0c81b049.js",
     "isDynamicEntry": true,
     "src": "resources/svg/icons/light/external-link.svg"
+  },
+  "resources/svg/icons/light/eye.svg": {
+    "file": "assets/eye-785bfb5b.js",
+    "isDynamicEntry": true,
+    "src": "resources/svg/icons/light/eye.svg"
   },
   "resources/svg/icons/light/fieldsets.svg": {
     "file": "assets/fieldsets-fda8f7b3.js",

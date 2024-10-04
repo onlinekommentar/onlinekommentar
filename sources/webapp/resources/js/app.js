@@ -19,6 +19,7 @@ import Authors from '@/components/Pages/Authors.vue'
 import Editors from '@/components/Pages/Editors.vue'
 import User from '@/components/Pages/User.vue'
 import VersionComparisonModalDialog from '@/components/Pages/Partials/VersionComparisonModalDialog.vue'
+import SearchFilters from '@/components/Menus/SearchFilters.vue'
 
 const app = createApp({
   components: {
@@ -30,7 +31,8 @@ const app = createApp({
     'authors': Authors,
     'editors': Editors,
     'user': User,
-    'version-comparison-modal-dialog': VersionComparisonModalDialog
+    'version-comparison-modal-dialog': VersionComparisonModalDialog,
+    'search-filters': SearchFilters
   }
 })
 

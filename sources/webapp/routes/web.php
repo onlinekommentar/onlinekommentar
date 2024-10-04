@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Frontend\CommentariesController;
+use App\Http\Controllers\Frontend\SearchController;
 use App\Http\Controllers\Frontend\UsersController;
 use Illuminate\Support\Facades\Route;
 
@@ -33,6 +34,4 @@ Route::get('{locale}/commentaries/{commentaryId}/revisions/{revisionTimestamp1}/
 // commentary revision comparison (latest published version – no revision timestamp selected)
 Route::get('{locale}/commentaries/{commentaryId}/revisions/{revisionTimestamp1}/compare/{revisionTimestamp2}', [CommentariesController::class, 'compareRevisions']);
 
-Route::statamic('{locale}/search', 'search', [
-    'title' => 'Search Results',
-]);
+Route::get('{locale}/search', [SearchController::class, 'index']);

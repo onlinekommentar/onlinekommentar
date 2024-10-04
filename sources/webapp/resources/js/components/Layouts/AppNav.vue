@@ -105,6 +105,7 @@
 
   const toggleMenu = () => {
     showMenu.value = !showMenu.value
+    window.dispatchEvent(new CustomEvent('toggleMenu', { detail: showMenu.value }));
   }
 
   const toggleSearchBox = () => {

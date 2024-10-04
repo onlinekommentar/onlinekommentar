@@ -1,5 +1,7 @@
 <?php
 
+use App\SearchTransformers\Content;
+
 return [
 
     /*
@@ -32,10 +34,13 @@ return [
         // ],
 
         'default' => [
-            'driver' => 'local',
+            'driver' => 'algolia',
             'searchables' => 'collection:commentaries',
-            'fields' => ['title', 'legal_text', 'content'],
+            'fields' => ['title', 'combined'],
             'sites' => ['en', 'de', 'it', 'fr'],
+            'transformers' => [
+                'combined' => Content::class,
+            ],
         ],
 
     ],
