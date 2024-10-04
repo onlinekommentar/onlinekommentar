@@ -1,6 +1,12 @@
 <div class="bg-white">
-  {{ search:results as="results" paginate="20" }}
-    <div class="px-8 py-4 mb-2 border-b border-black">
+  {{ search:results
+    as="results" 
+    paginate="20"
+    :sort="get:sort ?? void"
+    :legal_domain:is="get:legal_domain ?? void"
+    :editor:is="get:editor ?? void"
+    :author:is="get:author ?? void" }}
+    <div class="px-6 py-4 mb-2 border-b border-black">
       <h2 class="text-xs uppercase"><span class="font-medium">{{ get:q }}</span> – {{ paginate }}{{ total_items }}{{ /paginate }}
         {{ if results | count === 1 }}
           {{ trans:result_found }}
@@ -10,18 +16,29 @@
       </h2>
     </div>
 
-    <div class="container px-8 py-8">
+    <div class="px-8 py-8">
       <div class="row">
         <div class="col-12">
-          <div class="search-results">
+          <search-filters
+            :query="{{ get:q | to_json | sanitize }}"
+            :legal-domains="{{ legal_domains | to_json | sanitize }}"
+            :legal-domain="{{ legal_domains | where('id', get:legal_domain) | first | to_json | sanitize }}"
+            :editors="{{ editors | to_json | sanitize }}"
+            :editor="{{ editors | where('id', get:editor) | first | to_json | sanitize }}"
+            :authors="{{ authors | to_json | sanitize }}"
+            :author="{{ authors | where('id', get:author) | first | to_json | sanitize }}"
+            :sorts="{{ sorts | to_json | sanitize }}"
+            :sort="{{ sorts | where('id', get:sort) | first | to_json | sanitize }}">
+          </search-filters>
+          <div class="search-results mt-8">
               {{ if results }}
-                <ul class="border-t border-gray-300 pt-4">
+                <ul class="">
                 {{ results }}
                   {{ if content != '' }}
-                    <li class="flex justify-between items-start border-b border-gray-400 py-4">
-                      <span class="flex w-3/12 text-xl font-serif">{{ title }}</span>
-                      <span class="flex w-6/12 text-sm text-gray-700">{{ content  | raw | bard_text | truncate:200 }}</span>
-                      <a class="flex ok-button !mt-0" href="{{ url }}">{{ trans:open }}</a>
+                    <li class="flex max-md:flex-col max-md:gap-2 md:justify-between md:items-start border-t border-gray-400 py-4">
+                      <span class="md:flex md:w-3/12 text-xl font-serif">{{ title }}</span>
+                      <span class="md:flex md:w-6/12 text-sm text-gray-700">{{ content  | raw | bard_text | truncate:200 }}</span>
+                      <a class="max-md:w-max md:flex ok-button max-md:my-1 md:!mt-0" href="{{ url }}">{{ trans:open }}</a>
                     </li>
                   {{ endif }}
                 {{ /results }}
@@ -32,5 +49,42 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <div class="px-6 py-4 mb-2 border-t border-black">
+      <div class="text-xs uppercase flex justify-between">
+        {{ paginate }}
+          <div class="w-full">
+            <a href="{{ prev_page }}" class="flex items-center {{ !prev_page ? 'opacity-30 pointer-events-none' : '' }}">
+              <svg class="inline-block mr-1 rotate-180" xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 11 11">
+                <g id="Gruppe_51" data-name="Gruppe 51" transform="translate(10.5 -16.116) rotate(90)">
+                  <g id="Icon_feather-arrow-up" data-name="Icon feather-arrow-up" transform="translate(16.822)">
+                    <path id="Pfad_15" data-name="Pfad 15" d="M18,17.5V7.5" transform="translate(-13 -7.5)" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+                    <path id="Pfad_16" data-name="Pfad 16" d="M7.5,13.178l5-5.678,5,5.678" transform="translate(-7.5 -7.5)" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+                  </g>
+                </g>
+              </svg>
+              {{ trans:previous }}
+            </a>
+          </div>
+          <div class="shrink-0 min-w-max">
+            {{ current_page }} / {{ total_pages }}
+          </div>  
+          <div class="w-full flex justify-end">
+            <a href="{{ next_page }}" class="flex items-center {{ !next_page ? 'opacity-30 pointer-events-none' : '' }}">
+              {{ trans:next }}
+              <svg class="inline-block ml-1" xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 11 11">
+                <g id="Gruppe_51" data-name="Gruppe 51" transform="translate(10.5 -16.116) rotate(90)">
+                  <g id="Icon_feather-arrow-up" data-name="Icon feather-arrow-up" transform="translate(16.822)">
+                    <path id="Pfad_15" data-name="Pfad 15" d="M18,17.5V7.5" transform="translate(-13 -7.5)" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+                    <path id="Pfad_16" data-name="Pfad 16" d="M7.5,13.178l5-5.678,5,5.678" transform="translate(-7.5 -7.5)" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+                  </g>
+                </g>
+              </svg>
+            </a>
+          </div>
+        {{ /paginate }}
+      </div>
+    </div>
   {{ /search:results }}
 </div>

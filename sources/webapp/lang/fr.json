@@ -51,7 +51,13 @@
     "clear": "Effacer tout",
 
     "legal_domain_filter_label": "Actes législatifs",
-    "legal_domain_filter_all": "Tout",
+    "editor_filter_label": "Editeur",
+    "author_filter_label": "Auteur",
+    "filter_all": "Tout",
+
+    "sort_label": "Sort",
+    "sort_relevance": "Relevance",
+    "sort_date": "Date",
     
     "Federal Constitution": "Constitution fédérale",
     "Code of Obligations": "Code des Obligations",
