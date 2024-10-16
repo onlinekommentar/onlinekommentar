@@ -576,10 +576,12 @@ class Content
         $locale = $entry->locale();
 
         $value = implode(' ', [
-            $entry->get('title'),
+            $entry->assigned_authors?->pluck('name')->implode(' '),
+            $entry->asigned_editors?->pluck('name')->implode(' '),
             Statamic::modify($entry->get('legal_text'))->bardText()->fetch(),
             Statamic::modify($entry->get('content'))->bardText()->fetch(),
         ]);
+
         $value = Str::of($value)
             ->replaceMatches('/https?:\/\/\S+/u', '')
             ->replaceMatches('/[^\p{L}\p{N}\s]/u', '')
