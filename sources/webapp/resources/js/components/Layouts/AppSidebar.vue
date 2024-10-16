@@ -14,12 +14,12 @@
     </div>
     
     <!-- sidebar handle -->
-    <div @click="toggleSidebar" id="handle" class="absolute right-0 py-6 -mt-24 -mr-5 rounded-tr-lg rounded-br-lg md:py-10 md:-mr-4 top-1/2 bg-ok-blue shadow-tr-lg shadow-br-lg">
-      <div class="flex flex-col items-center mt-6 w-7 md:w-10 xl:w-12">
-        <div id="handle-text" class="mb-6 text-xs font-medium tracking-wider uppercase">
-          {{ $t('sidebar_handle_text') }}
+    <div @click="toggleSidebar" id="handle" class="absolute left-full top-1/2 -ml-2 md:-ml-7 rounded-bl-lg rounded-br-lg bg-ok-blue">
+      <div class="flex items-center gap-2 w-max py-1.5 px-4 md:gap-4 md:py-3 md:px-8">
+        <img class="w-4 md:w-6 rotate-90" src="/img/sidebar-handle.svg" alt="{{ $t('commentaries') }}">
+        <div class="text-xs font-medium tracking-wider uppercase">
+          {{ $t('commentaries') }}
         </div>
-        <img class="w-4 mt-6 md:w-6" src="/img/sidebar-handle.svg" alt="Handle">
       </div>
     </div>
     <!-- end sidebar handle -->
@@ -27,13 +27,21 @@
 </template>
 
 <script setup>
-  import { ref } from 'vue'
+  import { ref, onMounted } from 'vue'
 
   const isSidebarOpen = ref(false)
   
   const toggleSidebar = () => {
     isSidebarOpen.value = !isSidebarOpen.value
   }
+
+  onMounted(() => {
+    if (window.matchMedia('(min-width: 768px)').matches) {
+      window.addEventListener('toggleMenu', (event) => {
+        isSidebarOpen.value = event.detail;
+      })
+    }
+  })
 </script>
 
 <style lang="postcss" scoped>
@@ -54,9 +62,7 @@
 
   #handle {
     cursor: pointer;
-
-    #handle-text {
-      transform: rotate(-90deg);
-    }  
+    transform-origin: top left;
+    transform: rotate(-90deg) translateX(-50%);
   }
 </style>

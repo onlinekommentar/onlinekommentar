@@ -51,7 +51,13 @@
   "clear": "Cancella tutto",
 
   "legal_domain_filter_label": "Decreti",
-  "legal_domain_filter_all": "Tutto",
+  "editor_filter_label": "Editore",
+  "author_filter_label": "Autore",
+  "filter_all": "Tutto",
+
+  "sort_label": "Filtra",
+  "sort_relevance": "Rilevanza",
+  "sort_date": "Data",
 
   "Federal Constitution": "Costituzione federale",
   "Code of Obligations": "Diritto delle obbligazioni",

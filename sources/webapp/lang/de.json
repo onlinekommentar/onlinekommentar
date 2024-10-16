@@ -51,7 +51,13 @@
   "clear": "Alle löschen",
 
   "legal_domain_filter_label": "Erlasse",
-  "legal_domain_filter_all": "Alle",
+  "editor_filter_label": "Herausgeber",
+  "author_filter_label": "Autor",
+  "filter_all": "Alle",
+
+  "sort_label": "Sortieren",
+  "sort_relevance": "Sortieren",
+  "sort_date": "Datum",
 
   "Federal Constitution": "Bundesverfassung",
   "Code of Obligations": "Obligationenrecht",
@@ -115,7 +121,7 @@
   "creative_commons_text": "ist lizenziert unter einer <a href=\"http://creativecommons.org/licenses/by/4.0/\">Creative Commons Namensnennung 4.0 International Lizenz.",
 
   "and": "/",
-  "commentary_by": "Ein Kommentar von",
+  "commentary_by": "Eine Kommentierung von",
   "edited_by": "Herausgegeben von",
 
   "result_found": "Resultat gefunden",

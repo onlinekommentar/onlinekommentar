@@ -51,7 +51,13 @@
     "clear": "Effacer tout",
 
     "legal_domain_filter_label": "Actes législatifs",
-    "legal_domain_filter_all": "Tout",
+    "editor_filter_label": "Editeur",
+    "author_filter_label": "Auteur",
+    "filter_all": "Tout",
+
+    "sort_label": "Trier",
+    "sort_relevance": "Pertinence",
+    "sort_date": "Date",
     
     "Federal Constitution": "Constitution fédérale",
     "Code of Obligations": "Code des Obligations",
@@ -109,7 +115,7 @@
     "compare_versions": "Comparer les versions",
     "is_translated": "ATTENTION : Cette version du commentaire est une traduction automatique de l’original. Le commentaire original est en :original_language. La traduction a été faite avec www.deepl.com. Seule la version originale fait foi. La version traduite du commentaire ne peut pas être citée.",
 
-    "visited_at": "visité le",
+    "visited_at": "consulté le",
 
     "creative_commons_license": "Licence Creative Commons",
     "creative_commons_text": "est sous licence <a href=\"http://creativecommons.org/licenses/by/4.0/\">Creative Commons Attribution 4.0 International License.</a>",

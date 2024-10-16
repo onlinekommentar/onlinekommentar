@@ -51,7 +51,13 @@
   "clear": "Clear all",
 
   "legal_domain_filter_label": "Legislative Acts",
-  "legal_domain_filter_all": "All",
+  "editor_filter_label": "Editor",
+  "author_filter_label": "Author",
+  "filter_all": "All",
+
+  "sort_label": "Sort",
+  "sort_relevance": "Relevance",
+  "sort_date": "Date",
 
   "Federal Constitution": "Federal Constitution",
   "Code of Obligations": "Code of Obligations",
