@@ -12,6 +12,8 @@ class SearchController extends Controller
 {
     public function index($locale)
     {
+        app()->setLocale($locale);
+
         $filters = Cache::remember('search-filter-'.$locale, 3600 * 24, function () {
             $legal_domains = Entry::query()
                 ->where('collection', 'legal_domains')

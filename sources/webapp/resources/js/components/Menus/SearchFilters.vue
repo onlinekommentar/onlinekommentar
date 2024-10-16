@@ -23,7 +23,7 @@
     />
     <FlyoutMenuWithDividers
       v-if="sorts.length > 0"
-      class="md:w-[200px] md:grow-[2] rounded-md uppercase tracking-wider"
+      class="md:w-[300px] md:grow-[3] rounded-md uppercase tracking-wider"
       :label="$t('sort_label')"
       :options="sorts"
       :active-option="activeSort"

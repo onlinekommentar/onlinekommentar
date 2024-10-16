@@ -33,5 +33,5 @@ Route::get('{locale}/kommentare/{commentarySlug}/print', [CommentariesController
 Route::get('{locale}/commentaries/{commentaryId}/revisions/{revisionTimestamp1}/compare/{revisionTimestamp2}/versions/{versionTimestamp}', [CommentariesController::class, 'compareRevisions']);
 // commentary revision comparison (latest published version – no revision timestamp selected)
 Route::get('{locale}/commentaries/{commentaryId}/revisions/{revisionTimestamp1}/compare/{revisionTimestamp2}', [CommentariesController::class, 'compareRevisions']);
-
+// Search results view
 Route::get('{locale}/search', [SearchController::class, 'index']);
