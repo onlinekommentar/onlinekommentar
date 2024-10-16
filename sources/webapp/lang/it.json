@@ -55,9 +55,9 @@
   "author_filter_label": "Autore",
   "filter_all": "Tutto",
 
-  "sort_label": "Sort",
-  "sort_relevance": "Relevance",
-  "sort_date": "Date",
+  "sort_label": "Filtra",
+  "sort_relevance": "Rilevanza",
+  "sort_date": "Data",
 
   "Federal Constitution": "Costituzione federale",
   "Code of Obligations": "Diritto delle obbligazioni",
