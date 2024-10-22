@@ -583,13 +583,12 @@ class Content
         ]);
 
         $value = Str::of($value)
+            ->lower()
             ->replaceMatches('/https?:\/\/\S+/u', '')
             ->replaceMatches('/[^\p{L}\p{N}\s]/u', '')
             ->explode(' ')
-            ->map(fn ($word) => (string) Str::of($word)->lower())
             ->reject(fn ($word) => in_array($word, $this->stopwords[$locale]))
             ->join(' ');
-        $value = Str::limit($value, 9200);
 
         return $value;
     }

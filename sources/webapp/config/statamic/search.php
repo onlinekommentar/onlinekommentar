@@ -30,11 +30,12 @@ return [
         // 'default' => [
         //     'driver' => 'local',
         //     'searchables' => 'all',
-        //     'fields' => ['title'],
+        //     'fields' => ['title'],s
         // ],
 
         'default' => [
-            'driver' => 'algolia',
+            'driver' => 'algolia_split',
+            'split' => 'combined',
             'searchables' => 'collection:commentaries',
             'fields' => ['title', 'combined'],
             'sites' => ['en', 'de', 'it', 'fr'],
@@ -64,6 +65,13 @@ return [
         ],
 
         'algolia' => [
+            'credentials' => [
+                'id' => env('ALGOLIA_APP_ID', ''),
+                'secret' => env('ALGOLIA_SECRET', ''),
+            ],
+        ],
+
+        'algolia_split' => [
             'credentials' => [
                 'id' => env('ALGOLIA_APP_ID', ''),
                 'secret' => env('ALGOLIA_SECRET', ''),
