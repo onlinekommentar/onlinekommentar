@@ -5,6 +5,7 @@ namespace App\Search\AlgoliaSplit;
 use GuzzleHttp\Exception\ConnectException;
 use Statamic\Search\Algolia\Index as StatamicIndex;
 use Statamic\Search\Documents;
+use Statamic\Search\Result;
 use Statamic\Support\Str;
 
 class Index extends StatamicIndex
@@ -120,14 +121,14 @@ class Index extends StatamicIndex
 
     public function searchUsingApi($query, $fields = null)
     {
-        $arguments = [];
+        $options = $this->config['options'] ?? [];
 
         if ($fields) {
-            $arguments['restrictSearchableAttributes'] = implode(',', Arr::wrap($fields));
+            $options['restrictSearchableAttributes'] = implode(',', Arr::wrap($fields));
         }
 
         try {
-            $response = $this->getIndex()->search($query, $arguments);
+            $response = $this->getIndex()->search($query, $options);
         } catch (AlgoliaException $e) {
             $this->handleAlgoliaException($e);
         }
@@ -154,5 +155,13 @@ class Index extends StatamicIndex
         }
 
         throw $e;
+    }
+
+    public function extraAugmentedResultData(Result $result)
+    {
+        return [
+            'search_highlights' => $result->getRawResult()['_highlightResult'] ?? null,
+            'search_snippets' => $result->getRawResult()['_snippetResult'] ?? null,
+        ];
     }
 }

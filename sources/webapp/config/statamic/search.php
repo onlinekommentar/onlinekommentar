@@ -1,6 +1,6 @@
 <?php
 
-use App\SearchTransformers\Content;
+use App\SearchTransformers\Combined;
 
 return [
 
@@ -36,11 +36,17 @@ return [
         'default' => [
             'driver' => 'algolia_split',
             'split' => 'combined',
+            'options' => [
+                'attributesToHighlight' => null,
+                'attributesToSnippet' => ['combined:40'],
+                'highlightPreTag' => '<mark>',
+                'highlightPostTag' => '</mark>',
+            ],
             'searchables' => 'collection:commentaries',
             'fields' => ['title', 'combined'],
             'sites' => ['en', 'de', 'it', 'fr'],
             'transformers' => [
-                'combined' => Content::class,
+                'combined' => Combined::class,
             ],
         ],
 

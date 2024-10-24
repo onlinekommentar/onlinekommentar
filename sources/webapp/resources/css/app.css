@@ -24,6 +24,14 @@ article {
   grid-template-columns: 100%;
 }
 
+mark {
+  background-color: #FCF0BD;
+}
+
+::target-text {
+  background-color: #FCF0BD;
+}
+
 /*
  * Commentary tree
  */
