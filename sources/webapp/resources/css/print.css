@@ -167,4 +167,17 @@ footnote {
         margin-top: 1.1rem;
         font-size: 1.1rem;
     }
+    ul {
+        list-style-type: disc;
+        margin-left: 1.5rem;
+    }
+    ol {
+        list-style-type: decimal;
+        margin-left: 1.5rem;
+    }
+    ul, ol {
+        li + li {
+            margin-top: 0.5rem;
+        }
+    }
 }
