@@ -380,7 +380,14 @@ class CommentariesController extends Controller
 
     public function print(Request $request, $locale, $commentarySlug)
     {
-        $cacheKey = "commentary_print:{$locale}:{$commentarySlug}";
+        $entry = Entry::query()
+            ->where('collection', 'commentaries')
+            ->where('locale', $locale)
+            ->where('slug', $commentarySlug)
+            ->first();
+        
+        $cacheKey = "commentary_print:{$locale}:{$commentarySlug}:{$entry->get('updated_at')}";
+
         if (config('app.env') !== 'local' && Cache::has($cacheKey)) {
             $file = Cache::get($cacheKey);
 
@@ -392,12 +399,6 @@ class CommentariesController extends Controller
         }
 
         app()->setLocale($locale);
-
-        $entry = Entry::query()
-            ->where('collection', 'commentaries')
-            ->where('locale', $locale)
-            ->where('slug', $commentarySlug)
-            ->first();
 
         if (! $entry) {
             abort(404);
