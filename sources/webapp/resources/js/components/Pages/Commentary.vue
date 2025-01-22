@@ -390,6 +390,10 @@
       @apply w-full overflow-x-auto block;
     }
 
+    :deep(img) {
+      @apply my-4 w-full h-auto;
+    }
+
     :deep(table) tbody tr:first-child {
       @apply bg-gray-100 border border-gray-400;
       p {

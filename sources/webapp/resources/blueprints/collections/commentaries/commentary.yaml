@@ -149,6 +149,7 @@ tabs:
                 - superscript
                 - anchor
                 - footnote
+                - image
               save_html: false
               toolbar_mode: fixed
               link_noopener: true
@@ -175,6 +176,7 @@ tabs:
               inline: false
               word_count: false
               hide_display: false
+              container: documents
           -
             handle: converter
             field:
