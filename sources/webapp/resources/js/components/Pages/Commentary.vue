@@ -391,7 +391,7 @@
     }
 
     :deep(img) {
-      @apply my-4 w-full h-auto;
+      @apply my-4 mx-auto max-w-full h-auto w-auto;
     }
 
     :deep(table) tbody tr:first-child {
