@@ -25,6 +25,9 @@ Route::post('converter/html-prosemirror', function (Request $request) {
 Route::post('converter/entry-word', function (Request $request) {
     $values = $request->json()->all();
     $entry = Entry::find($values['id']);
+    if ($entry->hasWorkingCopy()) {
+        $entry = $entry->makeFromRevision($entry->workingCopy());
+    }
     $file = (new Converter)->entryToWord($entry);
 
     return response()
@@ -35,6 +38,9 @@ Route::post('converter/entry-word', function (Request $request) {
 Route::post('converter/entry-pdf', function (Request $request) {
     $values = $request->json()->all();
     $entry = Entry::find($values['id']);
+    if ($entry->hasWorkingCopy()) {
+        $entry = $entry->makeFromRevision($entry->workingCopy());
+    }
     $file = (new Converter)->entryToHtmlPdf($entry);
 
     return response()
