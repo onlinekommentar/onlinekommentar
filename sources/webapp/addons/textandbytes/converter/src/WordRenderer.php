@@ -399,7 +399,7 @@ class WordRenderer
     protected function parseFootnoteHtml($html)
     {
         $nodes = collect($this->editor->setContent($html)->getDocument()['content'] ?? [])
-            ->map(fn ($node) => array_merge($node['content'], [['type' => 'hardBreak']]))
+            ->map(fn ($node) => array_merge($node['content'] ?? [], [['type' => 'hardBreak']]))
             ->flatten(1)
             ->slice(0, -1)
             ->all();
