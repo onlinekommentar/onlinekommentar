@@ -82,6 +82,7 @@ class CommentariesController extends Controller
 
         if ($commentaryData['blueprint']['handle'] !== 'commentary') {
             // load the commentary detail view
+            app()->setLocale($locale);
             $view = (new View)
                 ->template('commentaries/group')
                 ->layout('layout')
