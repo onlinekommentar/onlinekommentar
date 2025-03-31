@@ -151,5 +151,10 @@
   "editor_of": "Editor of",
   "author_of": "Author of",
 
-  "current_version": "Current version"
+  "current_version": "Current version",
+
+  "supporters_intro": "The Online Commentary is a non-profit project, supported by a strong community.",
+  "supporters_corporate": "Who supports us as a corporate member",
+  "supporters_member": "We receive further support from the following association members",
+  "supporters_organization": "We have received financial support from the following organizations: Faculty of Law of the University of Zurich, Kalaidos University of Applied Sciences Switzerland. We would also like to thank Prof. Walter Boente for his support in the technical implementation of the publication platform."
 }

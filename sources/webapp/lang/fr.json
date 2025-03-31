@@ -151,5 +151,10 @@
     "editor_of": "Editeur de",
     "author_of": "Auteur de",
 
-    "current_version": "Version actuelle"
-  }
+    "current_version": "Version actuelle",
+
+    "supporters_intro": "Le Commentaire en ligne est un projet à but non lucratif et soutenu par une communauté forte.",
+    "supporters_corporate": "Qui nous soutient en tant que membre d'entreprise",
+    "supporters_member": "Nous bénéficions également du soutien des membres suivants de l'association",
+    "supporters_organization": "Nous avons reçu un soutien financier de la part des organisations suivantes : Faculté de droit de l'Université de Zurich, Kalaidos Fachhochschule Schweiz. En outre, nous souhaitons remercier le professeur Walter Boente pour son soutien dans la mise en œuvre technique de la plateforme de publication."
+}

@@ -20,6 +20,7 @@ import Editors from '@/components/Pages/Editors.vue'
 import User from '@/components/Pages/User.vue'
 import VersionComparisonModalDialog from '@/components/Pages/Partials/VersionComparisonModalDialog.vue'
 import SearchFilters from '@/components/Menus/SearchFilters.vue'
+import LogoCarousel from '@/components/Pages/Partials/LogoCarousel.vue'
 
 const app = createApp({
   components: {
@@ -32,7 +33,8 @@ const app = createApp({
     'editors': Editors,
     'user': User,
     'version-comparison-modal-dialog': VersionComparisonModalDialog,
-    'search-filters': SearchFilters
+    'search-filters': SearchFilters,
+    'logo-carousel': LogoCarousel
   }
 })
 

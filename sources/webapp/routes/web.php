@@ -4,6 +4,7 @@ use App\Http\Controllers\Frontend\CommentariesController;
 use App\Http\Controllers\Frontend\SearchController;
 use App\Http\Controllers\Frontend\UsersController;
 use Illuminate\Support\Facades\Route;
+use Statamic\Facades\Entry;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,3 +36,9 @@ Route::get('{locale}/commentaries/{commentaryId}/revisions/{revisionTimestamp1}/
 Route::get('{locale}/commentaries/{commentaryId}/revisions/{revisionTimestamp1}/compare/{revisionTimestamp2}', [CommentariesController::class, 'compareRevisions']);
 // Search results view
 Route::get('{locale}/search', [SearchController::class, 'index']);
+
+if (app()->isLocal()) {
+    Route::get('/sandbox', function () {
+        
+    });
+}

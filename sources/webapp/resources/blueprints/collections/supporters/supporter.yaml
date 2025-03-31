@@ -1,0 +1,63 @@
+tabs:
+  main:
+    display: Main
+    sections:
+      -
+        fields:
+          -
+            handle: title
+            field:
+              type: text
+              required: true
+              width: 66
+              localizable: false
+              validate:
+                - required
+          -
+            handle: type
+            field:
+              options:
+                -
+                  key: member
+                  value: Member
+                -
+                  key: corporate
+                  value: Corporate
+              type: button_group
+              display: Type
+              localizable: false
+              width: 33
+              default: member
+              listable: true
+          -
+            handle: logo
+            field:
+              max_files: 1
+              container: documents
+              folder: supporters
+              type: assets
+              display: Logo
+              localizable: false
+              if:
+                type: 'equals corporate'
+          -
+            handle: link
+            field:
+              type: link
+              display: Link
+              localizable: false
+              if:
+                type: 'equals corporate'
+  sidebar:
+    display: Sidebar
+    sections:
+      -
+        fields:
+          -
+            handle: slug
+            field:
+              type: slug
+              localizable: true
+              validate:
+                - 'max:200'
+title: Supporter

@@ -151,5 +151,10 @@
   "editor_of": "Editore di",
   "author_of": "Autore di",
 
-  "current_version": "Versione attuale"
+  "current_version": "Versione attuale",
+
+  "supporters_intro": "Il Commentario online è un progetto senza scopo di lucro, sostenuto da una forte comunità.",
+  "supporters_corporate": "Chi ci sostiene come membro dell'azienda",
+  "supporters_member": "Riceviamo ulteriore sostegno dai seguenti membri dell'associazione",
+  "supporters_organization": "Abbiamo ricevuto il sostegno finanziario delle seguenti organizzazioni: Facoltà di Giurisprudenza dell'Università di Zurigo, Università di Scienze Applicate Kalaidos Svizzera. Desideriamo inoltre ringraziare il Prof. Walter Boente per il suo supporto nell'implementazione tecnica della piattaforma di pubblicazione."
 }

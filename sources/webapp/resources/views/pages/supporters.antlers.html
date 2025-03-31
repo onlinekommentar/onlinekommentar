@@ -1,0 +1,25 @@
+<div class="md:max-w-[1080px] md:mx-auto md:mb-auto px-4 md:px-12 lg:px-24 xl:px-32">
+  <h1 class="py-8 text-xl text-center md:text-3xl lg:text-4xl">
+    {{ title }}
+  </h1>
+
+  <p class="text-center mb-4">{{ trans:supporters_corporate }}:</p>
+  <div class="overflow-hidden divide-y divide-gray-800 sm:divide-y-0 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 sm:gap-px mb-6">
+    {{ collection:supporters type:is="corporate" sort="random" site="en" }}
+      <a href="{{ link }}" target="_blank" rel="nofollow" class="bg-white p-8 flex items-center justify-center aspect-video hover:bg-ok-orange transition h-full">
+        <img src="{{ logo }}" alt="{{ title }}" width="{{ logo | area_width(8000) }}">
+      </a>
+    {{ /collection:supporters }}
+  </div>
+
+  <p class="text-center mb-4">{{ trans:supporters_member }}:</p>
+  <div class="overflow-hidden divide-y divide-gray-800 sm:divide-y-0 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 sm:gap-px mb-6">
+    {{ collection:supporters type:is="member" sort="title" site="en" }}
+      <div href="{{ link }}" class="bg-white px-3 py-2">
+        {{ title }}
+      </div>
+    {{ /collection:supporters }}
+  </div>
+
+  <p class="text-center mb-4">{{ trans:supporters_organization }}:</p>
+</div>

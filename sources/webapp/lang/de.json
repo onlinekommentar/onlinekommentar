@@ -150,5 +150,10 @@
   "editor_of": "Herausgeber von",
   "author_of": "Kommentar zu",
 
-  "current_version": "Aktuelle Version"
+  "current_version": "Aktuelle Version",
+
+  "supporters_intro": "Der Onlinekommentar ist ein non-profit-Projekt, getragen von einer starken Gemeinschaft.",
+  "supporters_corporate": "Wer uns als Firmenmitglied unterstützt",
+  "supporters_member": "Weitere Unterstützung erhalten wir durch die folgenden Vereinsmitglieder",
+  "supporters_organization": "Wir haben durch folgende Organisationen eine finanzielle Unterstützung erhalten: Rechtswissenschaftliche Fakultät der Universität Zürich, Kalaidos Fachhochschule Schweiz. Zusätzlich möchten wir uns bei Prof. Walter Boente für die Unterstützung bei der technischen Umsetzung der Publikationsplattform bedanken."
 }
