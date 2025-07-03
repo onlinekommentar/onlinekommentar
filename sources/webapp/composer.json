@@ -10,7 +10,6 @@
     "require": {
         "php": "^8.2.0",
         "algolia/algoliasearch-client-php": "^3.2",
-        "api-platform/laravel": "^4.1",
         "caseyamcl/toc": "^3.1",
         "cweagans/composer-patches": "^1.7",
         "gotenberg/gotenberg-php": "^1.1",
