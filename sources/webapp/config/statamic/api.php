@@ -33,7 +33,7 @@ return [
         'users' => false,
     ],
 
-    'route' => env('STATAMIC_API_ROUTE', 'api/internal'),
+    'route' => env('STATAMIC_API_ROUTE', 'api-int'),
 
     /*
     |--------------------------------------------------------------------------

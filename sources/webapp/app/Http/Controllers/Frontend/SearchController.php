@@ -28,7 +28,7 @@ class SearchController extends Controller
                 ->all();
             $commenatries = Entry::query()
                 ->where('collection', 'commentaries')
-                ->where('status', 'published')
+                ->whereStatus('published')
                 ->where('locale', app()->getLocale())
                 ->where(function ($query) {
                     $query->where('assigned_authors', '!=', null)

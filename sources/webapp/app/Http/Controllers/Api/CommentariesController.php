@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Search;
 
-class CommentaryController extends Controller
+class CommentariesController extends Controller
 {
     public function index(Request $request)
     {
@@ -27,7 +27,7 @@ class CommentaryController extends Controller
         $query
             ->where('collection', 'commentaries')
             ->where('blueprint', 'commentary')
-            ->where('status', 'published')
+            ->whereStatus('published')
             ->where('site', $language)
             ->when($legislativeAct, function ($query) use ($legislativeAct) {
                 $query->where('legal_domain', $legislativeAct);
@@ -51,7 +51,7 @@ class CommentaryController extends Controller
         $entry = Entry::query()
             ->where('collection', 'commentaries')
             ->where('blueprint', 'commentary')
-            ->where('status', 'published')
+            ->whereStatus('published')
             ->where('id', $id)
             ->first();
 
