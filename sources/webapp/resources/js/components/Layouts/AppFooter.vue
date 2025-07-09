@@ -89,6 +89,13 @@
     <div>
       <div class="flex flex-row justify-between px-8 pt-8 mb-2 lg:mb-0">
         <div class="flex flex-col lg:flex-row text-xs lg:space-x-4">
+
+          <NavLink
+            :href="'/' + locale + '/apis'"
+            :active="false">
+            {{ $t('apis') }}
+          </NavLink>
+
           <NavLink
             :href="'/' + locale + '/disclaimer'"
             :active="false">

@@ -6,7 +6,7 @@ use Statamic\Facades\Entry;
 $commentaries = Entry::query()
     ->where('collection', 'commentaries')
     ->where('locale', app()->getLocale())
-    ->where('status', 'published')
+    ->whereStatus('published')
     ->orderBy('title', 'asc')
     ->get()
     ->map(function ($commentary, $key) {

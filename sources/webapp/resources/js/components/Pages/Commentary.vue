@@ -257,7 +257,7 @@
 
   const setLegalTextLocale = (locale) => {
     // filter all commentary entries by the given locale and commentary slug and return the legal text field
-    axios.get('/api/collections/commentaries/entries/?filter[site]=' + locale + '&filter[slug]=' + props.commentary.slug + '&fields=legal_text')
+    axios.get('/api-int/collections/commentaries/entries/?filter[site]=' + locale + '&filter[slug]=' + props.commentary.slug + '&fields=legal_text')
       .then(response => {
         localizedLegalText.value = response.data.data[0].legal_text
       })

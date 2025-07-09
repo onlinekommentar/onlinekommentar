@@ -84,7 +84,7 @@ class UsersController extends Controller
     {
         return Entry::query()
             ->where('collection', 'commentaries')
-            ->where('status', 'published')
+            ->whereStatus('published')
             ->where('locale', $locale)
             ->where($userFieldName, '!=', null)
             ->get()
