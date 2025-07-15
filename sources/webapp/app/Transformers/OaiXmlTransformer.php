@@ -14,11 +14,11 @@ class OaiXmlTransformer
         $identifier = "oai:{$domain}:commentary:{$entry->id}";
         $datestamp = $entry->date->format('Y-m-d');
 
-        $setSpecs = ['openaire_data'];
+        $setSpecs = [];
         if ($entry->get('legal_domain')) {
             $legalDomain = Entry::find($entry->get('legal_domain'));
             if ($legalDomain) {
-                $setSpecs[] = 'legal_domain:'.$legalDomain->slug;
+                $setSpecs[] = 'legal_domain:'.$legalDomain->id;
             }
         }
 
@@ -48,18 +48,15 @@ class OaiXmlTransformer
 
     public static function writeDublinCore(XMLWriter $writer, EntryContract $entry): void
     {
+        $domain = parse_url(config('app.url'), PHP_URL_HOST);
+
         $writer->startElementNs('oai_dc', 'dc', 'http://www.openarchives.org/OAI/2.0/oai_dc/');
         $writer->writeAttribute('xmlns:dc', 'http://purl.org/dc/elements/1.1/');
         $writer->writeAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
         $writer->writeAttribute('xsi:schemaLocation', 'http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd');
 
         $writer->writeElementNs('dc', 'title', null, $entry->title);
-
-        if ($entry->assigned_authors) {
-            foreach ($entry->assigned_authors as $author) {
-                $writer->writeElementNs('dc', 'creator', null, $author->get('name'));
-            }
-        }
+        $writer->writeElementNs('dc', 'creator', null, 'Onlinekommentar');
 
         if ($entry->get('legal_domain')) {
             $legalDomain = Entry::find($entry->get('legal_domain'));
@@ -72,7 +69,13 @@ class OaiXmlTransformer
             $writer->writeElementNs('dc', 'description', null, $entry->suggested_citation_long);
         }
 
-        $writer->writeElementNs('dc', 'publisher', null, 'Online Commentary');
+        $writer->writeElementNs('dc', 'publisher', null, 'Onlinekommentar');
+
+        if ($entry->assigned_authors) {
+            foreach ($entry->assigned_authors as $author) {
+                $writer->writeElementNs('dc', 'contributor', null, $author->get('name'));
+            }
+        }
 
         if ($entry->assigned_editors) {
             foreach ($entry->assigned_editors as $editor) {
@@ -87,11 +90,17 @@ class OaiXmlTransformer
         $writer->writeElementNs('dc', 'type', null, 'Text');
 
         $writer->writeElementNs('dc', 'format', null, 'text/html');
+        $writer->writeElementNs('dc', 'format', null, 'application/pdf');
+        $writer->writeElementNs('dc', 'format', null, 'application/json');
+
+        $writer->writeElementNs('dc', 'source', null, $entry->absoluteUrl());
+        $writer->writeElementNs('dc', 'source', null, route('commentaries.print', ['locale' => $entry->locale, 'commentarySlug' => $entry->slug]));
+        $writer->writeElementNs('dc', 'source', null, route('api.commentaries.show', ['id' => $entry->id]));
 
         $identifier = 'oai:onlinekommentar.ch:'.$entry->id;
         $writer->writeElementNs('dc', 'identifier', null, $identifier);
-
-        $writer->writeElementNs('dc', 'rights', null, 'All rights reserved');
+        $writer->writeElementNs('dc', 'rights', null, '© '.date('Y').', Onlinekommentar.ch');
+        $writer->writeElementNs('dc', 'coverage', null, $domain);
 
         $writer->writeElementNs('dc', 'language', null, $entry->locale ?? 'en');
 
@@ -109,7 +118,7 @@ class OaiXmlTransformer
 
         $writer->startElementNs('oaire', 'resourceType', null);
         $writer->writeAttribute('resourceTypeGeneral', 'literature');
-        $writer->writeAttribute('uri', 'http://purl.org/coar/resource_type/c_6670');
+        $writer->writeAttribute('uri', 'http://purl.org/coar/resource_type/c_93fc');
         $writer->text('commentary');
         $writer->endElement();
 
@@ -120,22 +129,18 @@ class OaiXmlTransformer
         $writer->endElement();
         $writer->endElement();
 
-        $writer->startElementNs('datacite', 'creators', null);
-        if ($entry->assigned_authors && count($entry->assigned_authors) > 0) {
-            foreach ($entry->assigned_authors as $author) {
-                $writer->startElementNs('datacite', 'creator', null);
-                $writer->writeElementNs('datacite', 'creatorName', null, $author->get('name'));
-                $writer->endElement();
-            }
-        } else {
-            $writer->startElementNs('datacite', 'creator', null);
-            $writer->writeElementNs('datacite', 'creatorName', null, 'Online Kommentar');
-            $writer->endElement();
-        }
+        $writer->startElementNs('datacite', 'creator', null);
+        $writer->writeElementNs('datacite', 'creatorName', null, 'Onlinekommentar');
         $writer->endElement();
 
-        if ($entry->assigned_editors && count($entry->assigned_editors) > 0) {
+        if ($entry->assigned_authors || $entry->assigned_editors) {
             $writer->startElementNs('datacite', 'contributors', null);
+            foreach ($entry->assigned_authors as $author) {
+                $writer->startElementNs('datacite', 'contributor', null);
+                $writer->writeAttribute('contributorType', 'Author');
+                $writer->writeElementNs('datacite', 'contributorName', null, $author->get('name'));
+                $writer->endElement();
+            }
             foreach ($entry->assigned_editors as $editor) {
                 $writer->startElementNs('datacite', 'contributor', null);
                 $writer->writeAttribute('contributorType', 'Editor');
@@ -147,25 +152,34 @@ class OaiXmlTransformer
 
         $writer->writeElementNs('dc', 'language', null, $entry->locale ?? 'en');
 
-        $writer->writeElementNs('dc', 'publisher', null, 'Online Kommentar');
+        $writer->writeElementNs('dc', 'publisher', null, 'Onlinekommentar');
 
-        $publicationDate = $entry->date ? $entry->date->format('Y-m-d') : date('Y-m-d');
         $writer->startElementNs('datacite', 'dates', null);
         $writer->startElementNs('datacite', 'date', null);
         $writer->writeAttribute('dateType', 'Issued');
-        $writer->text($publicationDate);
+        $writer->text($entry->date?->format('Y-m-d'));
         $writer->endElement();
         $writer->endElement();
 
-        $identifier = 'oai:'.parse_url(config('app.url'), PHP_URL_HOST).':commentary:'.$entry->id;
         $writer->startElementNs('datacite', 'identifier', null);
         $writer->writeAttribute('identifierType', 'URL');
-        $writer->text(config('app.url').'/commentaries/'.$entry->slug);
+        $writer->text($entry->absoluteUrl());
+        $writer->endElement();
+
+        $writer->startElementNs('oaire', 'file', null);
+        $writer->writeAttribute('objectType', 'fulltext');
+        $writer->writeAttribute('mimeType', 'application/pdf');
+        $writer->text(route('commentaries.print', ['locale' => $entry->locale, 'commentarySlug' => $entry->slug]));
+        $writer->endElement();
+
+        $writer->startElementNs('oaire', 'file', null);
+        $writer->writeAttribute('objectType', 'fulltext');
+        $writer->writeAttribute('mimeType', 'application/json');
+        $writer->text(route('api.commentaries.show', ['id' => $entry->id]));
         $writer->endElement();
 
         $writer->startElementNs('datacite', 'rights', null);
-        $writer->writeAttribute('rightsURI', 'http://purl.org/coar/access_right/c_abf2');
-        $writer->text('open access');
+        $writer->text('© '.date('Y').', Onlinekommentar.ch');
         $writer->endElement();
 
         if ($entry->suggested_citation_long) {
@@ -184,19 +198,6 @@ class OaiXmlTransformer
             }
         }
 
-        if ($entry->get('pdf_file')) {
-            $writer->startElementNs('oaire', 'file', null);
-            $writer->writeAttribute('objectType', 'fulltext');
-            $writer->writeAttribute('mimeType', 'application/pdf');
-            $writer->writeAttribute('accessRightsURI', 'http://purl.org/coar/access_right/c_abf2');
-            $writer->text(config('app.url').'/storage/'.$entry->get('pdf_file'));
-            $writer->endElement();
-        }
-
-        if ($entry->get('parent_publication')) {
-            $writer->writeElementNs('oaire', 'citationTitle', null, $entry->get('parent_publication'));
-        }
-
         $writer->endElement();
     }
 
@@ -206,11 +207,11 @@ class OaiXmlTransformer
         $identifier = "oai:{$domain}:commentary:{$entry->id}";
         $datestamp = $entry->date ? $entry->date->format('Y-m-d') : date('Y-m-d');
 
-        $setSpecs = ['openaire_data'];
+        $setSpecs = [];
         if ($entry->get('legal_domain')) {
             $legalDomain = Entry::find($entry->get('legal_domain'));
             if ($legalDomain) {
-                $setSpecs[] = 'legal_domain:'.$legalDomain->slug;
+                $setSpecs[] = 'legal_domain:'.$legalDomain->id;
             }
         }
 

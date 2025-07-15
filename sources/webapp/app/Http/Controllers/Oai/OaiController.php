@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Oai;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Oai\OaiResponseResource;
+use App\Http\Resources\Oai\ResponseResource;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -28,7 +28,7 @@ class OaiController extends Controller
         $verb = $request->input('verb');
 
         if (! $verb) {
-            return OaiResponseResource::error('badVerb', 'Missing verb parameter', $request);
+            return ResponseResource::error('badVerb', 'Missing verb parameter', $request);
         }
 
         return match ($verb) {
@@ -38,7 +38,7 @@ class OaiController extends Controller
             'ListIdentifiers' => $this->listIdentifiers($request),
             'ListRecords' => $this->listRecords($request),
             'GetRecord' => $this->getRecord($request),
-            default => OaiResponseResource::error('badVerb', 'Invalid verb', $request),
+            default => ResponseResource::error('badVerb', 'Invalid verb', $request),
         };
     }
 
@@ -52,7 +52,9 @@ class OaiController extends Controller
             ->orderBy('date')
             ->first()
             ?->date
-            ?->format('Y-m-d') ?? '2020-01-01';
+            ?->format('Y-m-d') ?? '2022-12-02';
+
+        $domain = parse_url(config('app.url'), PHP_URL_HOST);
 
         $data = [
             'repositoryName' => $this->repositoryName,
@@ -62,9 +64,17 @@ class OaiController extends Controller
             'earliestDatestamp' => $earliestDatestamp,
             'deletedRecord' => 'no',
             'granularity' => 'YYYY-MM-DD',
+            'description' => [
+                'oai-identifier' => [
+                    'scheme' => 'oai',
+                    'repositoryIdentifier' => $domain,
+                    'delimiter' => ':',
+                    'sampleIdentifier' => "oai:{$domain}:commentary:sample-id",
+                ],
+            ],
         ];
 
-        return OaiResponseResource::success('Identify', $data, $request);
+        return ResponseResource::success('Identify', $data, $request);
     }
 
     protected function listMetadataFormats(Request $request): Response
@@ -82,7 +92,7 @@ class OaiController extends Controller
                 ->first();
 
             if (! $entry) {
-                return OaiResponseResource::error('idDoesNotExist', 'Record not found', $request);
+                return ResponseResource::error('idDoesNotExist', 'Record not found', $request);
             }
         }
 
@@ -99,7 +109,7 @@ class OaiController extends Controller
             ],
         ];
 
-        return OaiResponseResource::success('ListMetadataFormats', ['formats' => $formats], $request);
+        return ResponseResource::success('ListMetadataFormats', ['formats' => $formats], $request);
     }
 
     protected function listSets(Request $request): Response
@@ -107,7 +117,7 @@ class OaiController extends Controller
         $resumptionToken = $request->input('resumptionToken');
 
         if ($resumptionToken && ! $this->isValidResumptionToken($resumptionToken)) {
-            return OaiResponseResource::error('badResumptionToken', 'Invalid resumption token', $request);
+            return ResponseResource::error('badResumptionToken', 'Invalid resumption token', $request);
         }
 
         $page = 1;
@@ -122,20 +132,13 @@ class OaiController extends Controller
         $legalDomains = $legalDomainsCollection
             ->queryEntries()
             ->get()
-            ->filter(fn ($domain) => ! empty($domain->slug))
             ->map(fn ($domain) => [
-                'setSpec' => 'legal_domain:'.$domain->slug,
+                'setSpec' => 'legal_domain:'.$domain->id,
                 'setName' => $domain->title,
                 'setDescription' => $domain->get('description'),
             ]);
 
-        $sets = collect([
-            [
-                'setSpec' => 'openaire_data',
-                'setName' => 'OpenAire Data Set',
-                'setDescription' => 'All commentaries available for OpenAire harvesting',
-            ],
-        ])->merge($legalDomains);
+        $sets = $legalDomains;
 
         $paginated = new LengthAwarePaginator(
             $sets->forPage($page, $perPage),
@@ -157,7 +160,7 @@ class OaiController extends Controller
                 : null,
         ];
 
-        return OaiResponseResource::success('ListSets', $data, $request);
+        return ResponseResource::success('ListSets', $data, $request);
     }
 
     protected function listIdentifiers(Request $request): Response
@@ -179,15 +182,15 @@ class OaiController extends Controller
         $resumptionToken = $request->input('resumptionToken');
 
         if (! $metadataPrefix && ! $resumptionToken) {
-            return OaiResponseResource::error('badArgument', 'Missing metadataPrefix', $request);
+            return ResponseResource::error('badArgument', 'Missing metadataPrefix', $request);
         }
 
         if ($metadataPrefix && ! in_array($metadataPrefix, ['oai_dc', 'oai_openaire'])) {
-            return OaiResponseResource::error('cannotDisseminateFormat', 'Unsupported metadata format', $request);
+            return ResponseResource::error('cannotDisseminateFormat', 'Unsupported metadata format', $request);
         }
 
         if ($resumptionToken && ! $this->isValidResumptionToken($resumptionToken)) {
-            return OaiResponseResource::error('badResumptionToken', 'Invalid resumption token', $request);
+            return ResponseResource::error('badResumptionToken', 'Invalid resumption token', $request);
         }
 
         $page = 1;
@@ -215,17 +218,17 @@ class OaiController extends Controller
             $query->where('date', '<=', Carbon::parse($until));
         }
 
-        if ($set && $set !== 'openaire_data') {
+        if ($set) {
             if (str_starts_with($set, 'legal_domain:')) {
-                $domainSlug = str_replace('legal_domain:', '', $set);
+                $domainId = str_replace('legal_domain:', '', $set);
                 $legalDomainsCollection = Collection::findByHandle('legal_domains');
                 $domain = $legalDomainsCollection
                     ->queryEntries()
-                    ->where('slug', $domainSlug)
+                    ->where('id', $domainId)
                     ->first();
 
                 if (! $domain) {
-                    return OaiResponseResource::error('badArgument', 'Invalid set', $request);
+                    return ResponseResource::error('badArgument', 'Invalid set', $request);
                 }
 
                 $query->where('legal_domain', $domain->id());
@@ -236,7 +239,7 @@ class OaiController extends Controller
             ->paginate($perPage, ['*'], 'page', $page);
 
         if ($paginator->isEmpty()) {
-            return OaiResponseResource::error('noRecordsMatch', 'No records match the criteria', $request);
+            return ResponseResource::error('noRecordsMatch', 'No records match the criteria', $request);
         }
 
         $data = [
@@ -259,7 +262,7 @@ class OaiController extends Controller
                 : null,
         ];
 
-        return OaiResponseResource::success($verb, $data, $request);
+        return ResponseResource::success($verb, $data, $request);
     }
 
     protected function getRecord(Request $request): Response
@@ -268,11 +271,11 @@ class OaiController extends Controller
         $metadataPrefix = $request->input('metadataPrefix');
 
         if (! $identifier || ! $metadataPrefix) {
-            return OaiResponseResource::error('badArgument', 'Missing required parameters', $request);
+            return ResponseResource::error('badArgument', 'Missing required parameters', $request);
         }
 
         if (! in_array($metadataPrefix, ['oai_dc', 'oai_openaire'])) {
-            return OaiResponseResource::error('cannotDisseminateFormat', 'Unsupported metadata format', $request);
+            return ResponseResource::error('cannotDisseminateFormat', 'Unsupported metadata format', $request);
         }
 
         $recordId = $this->extractRecordId($identifier);
@@ -285,7 +288,7 @@ class OaiController extends Controller
             ->first();
 
         if (! $entry) {
-            return OaiResponseResource::error('idDoesNotExist', 'Record not found', $request);
+            return ResponseResource::error('idDoesNotExist', 'Record not found', $request);
         }
 
         $data = [
@@ -293,7 +296,7 @@ class OaiController extends Controller
             'metadataPrefix' => $metadataPrefix,
         ];
 
-        return OaiResponseResource::success('GetRecord', $data, $request);
+        return ResponseResource::success('GetRecord', $data, $request);
     }
 
     protected function extractRecordId(string $identifier): ?string

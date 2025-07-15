@@ -16,22 +16,20 @@ class CommentaryResource extends JsonResource
         return [
             'id' => $entry->id,
             'title' => $entry->title,
-            'slug' => $entry->slug,
             'date' => $entry->date()?->format('Y-m-d'),
             'language' => $entry->locale,
             'authors' => $this->transformUsers($entry->assigned_authors)->all(),
             'editors' => $this->transformUsers($entry->assigned_editors)->all(),
             'legislative_act' => $this->transformLegalDomain($entry->value('legal_domain')),
-            $this->mergeWhen($request->routeIs('api.json.commentaries.show'), [
+            'link' => route('api.commentaries.show', ['id' => $entry->id]),
+            'html_link' => $entry->absoluteUrl(),
+            'pdf_link' => route('commentaries.print', ['locale' => $entry->locale, 'commentarySlug' => $entry->slug]),
+            'additional_document_links' => $this->transformAssets($entry->additional_documents)->all(),
+            $this->mergeWhen($request->routeIs('api.commentaries.show'), [
                 'suggested_citation_long' => $entry->suggested_citation_long,
                 'suggested_citation_short' => $entry->suggested_citation_short,
                 'content' => $entry->content,
                 'legal_text' => $entry->legal_text,
-                'pdf_download_urls' => [
-                    route('commentaries.print', ['locale' => $entry->locale, 'commentarySlug' => $entry->slug, 'text' => 'md']),
-                    route('commentaries.print', ['locale' => $entry->locale, 'commentarySlug' => $entry->slug, 'text' => 'lg']),
-                ],
-                'additional_document_urls' => $this->transformAssets($entry->additional_documents)->all(),
             ]),
         ];
     }

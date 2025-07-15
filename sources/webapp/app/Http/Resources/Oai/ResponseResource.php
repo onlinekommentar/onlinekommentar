@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use XMLWriter;
 
-class OaiResponseResource implements Responsable
+class ResponseResource implements Responsable
 {
     protected mixed $resource;
 
@@ -117,6 +117,29 @@ class OaiResponseResource implements Responsable
         $writer->writeElement('earliestDatestamp', $data['earliestDatestamp']);
         $writer->writeElement('deletedRecord', $data['deletedRecord']);
         $writer->writeElement('granularity', $data['granularity']);
+
+        if (isset($data['description'])) {
+            foreach ($data['description'] as $descriptionType => $descriptionData) {
+                $writer->startElement('description');
+
+                if ($descriptionType === 'oai-identifier') {
+                    $writer->startElement('oai-identifier');
+                    $writer->writeAttribute('xmlns', 'http://www.openarchives.org/OAI/2.0/oai-identifier');
+                    $writer->writeAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
+                    $writer->writeAttribute('xsi:schemaLocation', 'http://www.openarchives.org/OAI/2.0/oai-identifier http://www.openarchives.org/OAI/2.0/oai-identifier.xsd');
+
+                    $writer->writeElement('scheme', $descriptionData['scheme']);
+                    $writer->writeElement('repositoryIdentifier', $descriptionData['repositoryIdentifier']);
+                    $writer->writeElement('delimiter', $descriptionData['delimiter']);
+                    $writer->writeElement('sampleIdentifier', $descriptionData['sampleIdentifier']);
+
+                    $writer->endElement();
+                }
+
+                $writer->endElement();
+            }
+        }
+
         $writer->endElement();
     }
 
