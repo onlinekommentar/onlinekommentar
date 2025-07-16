@@ -31,7 +31,7 @@ class RecordResource implements Responsable
         return $this;
     }
 
-    protected function toArray(): array
+    public function toArray(): array
     {
         $entry = $this->resource;
         $domain = parse_url(config('app.url'), PHP_URL_HOST);

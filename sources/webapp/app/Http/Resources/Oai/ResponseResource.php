@@ -192,7 +192,8 @@ class ResponseResource implements Responsable
         $writer->startElement('ListIdentifiers');
 
         foreach ($records as $record) {
-            OaiXmlTransformer::writeOaiHeader($writer, $record);
+            $data = RecordResource::make($record)->toArray();
+            OaiXmlTransformer::writeOaiHeader($writer, $data);
         }
 
         if ($resumptionToken) {
