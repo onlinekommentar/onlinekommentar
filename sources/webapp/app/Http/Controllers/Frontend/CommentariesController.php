@@ -386,7 +386,7 @@ class CommentariesController extends Controller
             ->where('locale', $locale)
             ->where('slug', $commentarySlug)
             ->first();
-        
+
         $cacheKey = "commentary_print:{$locale}:{$commentarySlug}:{$entry->get('updated_at')}";
 
         if (config('app.env') !== 'local' && Cache::has($cacheKey)) {
