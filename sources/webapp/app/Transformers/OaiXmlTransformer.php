@@ -2,33 +2,19 @@
 
 namespace App\Transformers;
 
-use Statamic\Contracts\Entries\Entry as EntryContract;
-use Statamic\Facades\Entry;
 use XMLWriter;
 
 class OaiXmlTransformer
 {
-    public static function writeRecord(XMLWriter $writer, EntryContract $entry, string $metadataPrefix = 'oai_dc'): void
+    public static function writeRecord(XMLWriter $writer, array $data, string $metadataPrefix = 'oai_dc'): void
     {
-        $domain = parse_url(config('app.url'), PHP_URL_HOST);
-        $identifier = "oai:{$domain}:commentary:{$entry->id}";
-        $datestamp = $entry->date->format('Y-m-d');
-
-        $setSpecs = [];
-        if ($entry->get('legal_domain')) {
-            $legalDomain = Entry::find($entry->get('legal_domain'));
-            if ($legalDomain) {
-                $setSpecs[] = 'legal_domain:'.$legalDomain->id;
-            }
-        }
-
         $writer->startElement('record');
 
         $writer->startElement('header');
-        $writer->writeElement('identifier', $identifier);
-        $writer->writeElement('datestamp', $datestamp);
+        $writer->writeElement('identifier', $data['identifier']);
+        $writer->writeElement('datestamp', $data['datestamp']);
 
-        foreach ($setSpecs as $setSpec) {
+        foreach ($data['setSpecs'] as $setSpec) {
             $writer->writeElement('setSpec', $setSpec);
         }
 
@@ -37,77 +23,63 @@ class OaiXmlTransformer
         $writer->startElement('metadata');
 
         if ($metadataPrefix === 'oai_dc') {
-            static::writeDublinCore($writer, $entry);
+            static::writeDublinCore($writer, $data);
         } elseif ($metadataPrefix === 'oai_openaire') {
-            static::writeOpenAire($writer, $entry);
+            static::writeOpenAire($writer, $data);
         }
 
         $writer->endElement();
         $writer->endElement();
     }
 
-    public static function writeDublinCore(XMLWriter $writer, EntryContract $entry): void
+    public static function writeDublinCore(XMLWriter $writer, array $data): void
     {
-        $domain = parse_url(config('app.url'), PHP_URL_HOST);
-
         $writer->startElementNs('oai_dc', 'dc', 'http://www.openarchives.org/OAI/2.0/oai_dc/');
         $writer->writeAttribute('xmlns:dc', 'http://purl.org/dc/elements/1.1/');
         $writer->writeAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
         $writer->writeAttribute('xsi:schemaLocation', 'http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd');
 
-        $writer->writeElementNs('dc', 'title', null, $entry->title);
-        $writer->writeElementNs('dc', 'creator', null, 'Onlinekommentar');
+        $writer->writeElementNs('dc', 'title', null, $data['title']);
+        $writer->writeElementNs('dc', 'creator', null, $data['creator']);
 
-        if ($entry->get('legal_domain')) {
-            $legalDomain = Entry::find($entry->get('legal_domain'));
-            if ($legalDomain) {
-                $writer->writeElementNs('dc', 'subject', null, $legalDomain->title);
-            }
+        if ($data['subject']) {
+            $writer->writeElementNs('dc', 'subject', null, $data['subject']);
         }
 
-        if ($entry->suggested_citation_long) {
-            $writer->writeElementNs('dc', 'description', null, $entry->suggested_citation_long);
+        if ($data['description']) {
+            $writer->writeElementNs('dc', 'description', null, $data['description']);
         }
 
-        $writer->writeElementNs('dc', 'publisher', null, 'Onlinekommentar');
+        $writer->writeElementNs('dc', 'publisher', null, $data['publisher']);
 
-        if ($entry->assigned_authors) {
-            foreach ($entry->assigned_authors as $author) {
-                $writer->writeElementNs('dc', 'contributor', null, $author->get('name'));
-            }
+        foreach ($data['contributors'] as $contributor) {
+            $writer->writeElementNs('dc', 'contributor', null, $contributor['name']);
         }
 
-        if ($entry->assigned_editors) {
-            foreach ($entry->assigned_editors as $editor) {
-                $writer->writeElementNs('dc', 'contributor', null, $editor->get('name'));
-            }
+        if ($data['date']) {
+            $writer->writeElementNs('dc', 'date', null, $data['date']);
         }
 
-        if ($entry->date) {
-            $writer->writeElementNs('dc', 'date', null, $entry->date->format('Y-m-d'));
+        $writer->writeElementNs('dc', 'type', null, $data['types']['dc']);
+
+        foreach ($data['sources'] as $source) {
+            $writer->writeElementNs('dc', 'format', null, $source['type']);
         }
 
-        $writer->writeElementNs('dc', 'type', null, 'Text');
+        foreach ($data['sources'] as $source) {
+            $writer->writeElementNs('dc', 'source', null, $source['url']);
+        }
 
-        $writer->writeElementNs('dc', 'format', null, 'text/html');
-        $writer->writeElementNs('dc', 'format', null, 'application/pdf');
-        $writer->writeElementNs('dc', 'format', null, 'application/json');
+        $writer->writeElementNs('dc', 'identifier', null, $data['identifier']);
+        $writer->writeElementNs('dc', 'rights', null, $data['rights']);
+        $writer->writeElementNs('dc', 'coverage', null, $data['domain']);
 
-        $writer->writeElementNs('dc', 'source', null, $entry->absoluteUrl());
-        $writer->writeElementNs('dc', 'source', null, route('commentaries.print', ['locale' => $entry->locale, 'commentarySlug' => $entry->slug]));
-        $writer->writeElementNs('dc', 'source', null, route('api.commentaries.show', ['id' => $entry->id]));
-
-        $identifier = 'oai:onlinekommentar.ch:'.$entry->id;
-        $writer->writeElementNs('dc', 'identifier', null, $identifier);
-        $writer->writeElementNs('dc', 'rights', null, '© '.date('Y').', Onlinekommentar.ch');
-        $writer->writeElementNs('dc', 'coverage', null, $domain);
-
-        $writer->writeElementNs('dc', 'language', null, $entry->locale ?? 'en');
+        $writer->writeElementNs('dc', 'language', null, $data['language']);
 
         $writer->endElement();
     }
 
-    public static function writeOpenAire(XMLWriter $writer, EntryContract $entry): void
+    public static function writeOpenAire(XMLWriter $writer, array $data): void
     {
         $writer->startElementNs('oaire', 'resource', 'http://namespace.openaire.eu/schema/oaire/');
         $writer->writeAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
@@ -117,108 +89,85 @@ class OaiXmlTransformer
         $writer->writeAttribute('xsi:schemaLocation', 'http://namespace.openaire.eu/schema/oaire/ https://www.openaire.eu/schema/repo-lit/4.0/openaire.xsd');
 
         $writer->startElementNs('oaire', 'resourceType', null);
-        $writer->writeAttribute('resourceTypeGeneral', 'literature');
-        $writer->writeAttribute('uri', 'http://purl.org/coar/resource_type/c_93fc');
-        $writer->text('commentary');
+        $writer->writeAttribute('resourceTypeGeneral', $data['types']['openaireGeneral']);
+        $writer->writeAttribute('uri', $data['types']['openaireUri']);
+        $writer->text($data['types']['openaire']);
         $writer->endElement();
 
         $writer->startElementNs('datacite', 'titles', null);
         $writer->startElementNs('datacite', 'title', null);
-        $writer->writeAttribute('xml:lang', $entry->locale ?? 'en');
-        $writer->text($entry->title);
+        $writer->writeAttribute('xml:lang', $data['language']);
+        $writer->text($data['title']);
         $writer->endElement();
         $writer->endElement();
 
         $writer->startElementNs('datacite', 'creator', null);
-        $writer->writeElementNs('datacite', 'creatorName', null, 'Onlinekommentar');
+        $writer->writeElementNs('datacite', 'creatorName', null, $data['creator']);
         $writer->endElement();
 
-        if ($entry->assigned_authors || $entry->assigned_editors) {
+        if (! empty($data['contributors'])) {
             $writer->startElementNs('datacite', 'contributors', null);
-            foreach ($entry->assigned_authors as $author) {
+            foreach ($data['contributors'] as $contributor) {
                 $writer->startElementNs('datacite', 'contributor', null);
-                $writer->writeAttribute('contributorType', 'Author');
-                $writer->writeElementNs('datacite', 'contributorName', null, $author->get('name'));
-                $writer->endElement();
-            }
-            foreach ($entry->assigned_editors as $editor) {
-                $writer->startElementNs('datacite', 'contributor', null);
-                $writer->writeAttribute('contributorType', 'Editor');
-                $writer->writeElementNs('datacite', 'contributorName', null, $editor->get('name'));
+                $writer->writeAttribute('contributorType', $contributor['type']);
+                $writer->writeElementNs('datacite', 'contributorName', null, $contributor['name']);
                 $writer->endElement();
             }
             $writer->endElement();
         }
 
-        $writer->writeElementNs('dc', 'language', null, $entry->locale ?? 'en');
+        $writer->writeElementNs('dc', 'language', null, $data['language']);
 
-        $writer->writeElementNs('dc', 'publisher', null, 'Onlinekommentar');
+        $writer->writeElementNs('dc', 'publisher', null, $data['publisher']);
 
         $writer->startElementNs('datacite', 'dates', null);
         $writer->startElementNs('datacite', 'date', null);
         $writer->writeAttribute('dateType', 'Issued');
-        $writer->text($entry->date?->format('Y-m-d'));
+        $writer->text($data['date']);
         $writer->endElement();
         $writer->endElement();
 
         $writer->startElementNs('datacite', 'identifier', null);
         $writer->writeAttribute('identifierType', 'URL');
-        $writer->text($entry->absoluteUrl());
+        $writer->text($data['sources'][0]['url']);
         $writer->endElement();
 
-        $writer->startElementNs('oaire', 'file', null);
-        $writer->writeAttribute('objectType', 'fulltext');
-        $writer->writeAttribute('mimeType', 'application/pdf');
-        $writer->text(route('commentaries.print', ['locale' => $entry->locale, 'commentarySlug' => $entry->slug]));
-        $writer->endElement();
-
-        $writer->startElementNs('oaire', 'file', null);
-        $writer->writeAttribute('objectType', 'fulltext');
-        $writer->writeAttribute('mimeType', 'application/json');
-        $writer->text(route('api.commentaries.show', ['id' => $entry->id]));
-        $writer->endElement();
+        foreach ($data['sources'] as $source) {
+            if ($source['type'] !== 'text/html') {
+                $writer->startElementNs('oaire', 'file', null);
+                $writer->writeAttribute('objectType', 'fulltext');
+                $writer->writeAttribute('mimeType', $source['type']);
+                $writer->text($source['url']);
+                $writer->endElement();
+            }
+        }
 
         $writer->startElementNs('datacite', 'rights', null);
-        $writer->text('© '.date('Y').', Onlinekommentar.ch');
+        $writer->text($data['rights']);
         $writer->endElement();
 
-        if ($entry->suggested_citation_long) {
+        if ($data['description']) {
             $writer->startElementNs('dc', 'description', null);
-            $writer->writeAttribute('xml:lang', $entry->locale ?? 'en');
-            $writer->text($entry->suggested_citation_long);
+            $writer->writeAttribute('xml:lang', $data['language']);
+            $writer->text($data['description']);
             $writer->endElement();
         }
 
-        if ($entry->get('legal_domain')) {
-            $legalDomain = Entry::find($entry->get('legal_domain'));
-            if ($legalDomain) {
-                $writer->startElementNs('datacite', 'subjects', null);
-                $writer->writeElementNs('datacite', 'subject', null, $legalDomain->title);
-                $writer->endElement();
-            }
+        if ($data['subject']) {
+            $writer->startElementNs('datacite', 'subjects', null);
+            $writer->writeElementNs('datacite', 'subject', null, $data['subject']);
+            $writer->endElement();
         }
 
         $writer->endElement();
     }
 
-    public static function writeOaiHeader(XMLWriter $writer, EntryContract $entry): void
+    public static function writeOaiHeader(XMLWriter $writer, array $data): void
     {
-        $domain = parse_url(config('app.url'), PHP_URL_HOST);
-        $identifier = "oai:{$domain}:commentary:{$entry->id}";
-        $datestamp = $entry->date ? $entry->date->format('Y-m-d') : date('Y-m-d');
-
-        $setSpecs = [];
-        if ($entry->get('legal_domain')) {
-            $legalDomain = Entry::find($entry->get('legal_domain'));
-            if ($legalDomain) {
-                $setSpecs[] = 'legal_domain:'.$legalDomain->id;
-            }
-        }
-
         $writer->startElement('header');
-        $writer->writeElement('identifier', $identifier);
-        $writer->writeElement('datestamp', $datestamp);
-        foreach ($setSpecs as $setSpec) {
+        $writer->writeElement('identifier', $data['identifier']);
+        $writer->writeElement('datestamp', $data['datestamp']);
+        foreach ($data['setSpecs'] as $setSpec) {
             $writer->writeElement('setSpec', $setSpec);
         }
         $writer->endElement();

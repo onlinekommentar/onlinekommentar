@@ -16,9 +16,6 @@ tabs:
           -
             handle: content
             field:
-              collapse: false
-              always_show_set_button: false
-              previews: true
               buttons:
                 - h2
                 - h3
@@ -33,43 +30,22 @@ tabs:
                 - anchor
                 - image
                 - table
-              save_html: false
-              toolbar_mode: fixed
+                - code
+                - codeblock
               link_noopener: true
               link_noreferrer: true
-              target_blank: false
-              reading_time: false
-              fullscreen: true
               allow_source: false
-              enable_input_rules: true
-              enable_paste_rules: true
-              antlers: false
               remove_empty_nodes: false
               display: Content
               type: bard
-              icon: bard
               localizable: true
-              listable: hidden
-              instructions_position: above
-              visibility: visible
               always_save: false
-              replicator_preview: true
-              smart_typography: false
-              inline: false
-              word_count: false
               container: documents
-              hide_display: false
           -
             handle: template
             field:
-              hide_partials: true
-              blueprint: false
               display: Template
               type: template
-              icon: template
-              listable: hidden
-              instructions_position: above
-              visibility: visible
               always_save: false
               localizable: false
   sidebar:
@@ -82,6 +58,7 @@ tabs:
             field:
               type: slug
               localizable: true
+              validate: 'max:200'
           -
             handle: parent
             field:
