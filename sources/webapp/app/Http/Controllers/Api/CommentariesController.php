@@ -27,7 +27,7 @@ class CommentariesController extends Controller
         $query
             ->where('collection', 'commentaries')
             ->where('blueprint', 'commentary')
-            ->whereStatus('published')
+            ->where('status', 'published')
             ->where('site', $language)
             ->when($legislativeAct, function ($query) use ($legislativeAct) {
                 $query->where('legal_domain', $legislativeAct);
