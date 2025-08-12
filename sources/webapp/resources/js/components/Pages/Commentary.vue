@@ -100,6 +100,10 @@
         </div>
       </div>
 
+      <div v-if="commentary.double_blind_peer_review" class="p-4 text-sm space-y-4 bg-ok-yellow md:space-y-6 text-center mb-4">
+        {{ $t('double_blind_peer_review') }}
+      </div>
+
       <div v-if="localizedLegalText != ''" class="flex flex-col p-4 space-y-4 md:p-8 bg-ok-orange md:space-y-6">
         <div class="flex justify-end print:hidden">
           <span @click="setLegalTextLocale('de')" class="legal-text-locale-link" :class="{ active: legalTextLocale == 'de' }">de</span>

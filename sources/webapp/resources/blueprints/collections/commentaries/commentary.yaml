@@ -249,6 +249,18 @@ tabs:
               always_save: false
               localizable: true
           -
+            handle: double_blind_peer_review
+            field:
+              default: false
+              display: 'Double-Blind Peer Review'
+              type: toggle
+              icon: toggle
+              listable: hidden
+              instructions_position: above
+              visibility: visible
+              always_save: false
+              localizable: false
+          -
             handle: assigned_authors
             field:
               mode: select
