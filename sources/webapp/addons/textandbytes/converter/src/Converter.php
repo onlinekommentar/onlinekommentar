@@ -68,6 +68,8 @@ class Converter
 
     public function entryToWord($entry)
     {
+        app()->setLocale($entry->locale());
+
         if ($entry->collection()->handle() !== 'commentaries') {
             throw new \Exception('Entry is not a commentary');
         }
@@ -75,24 +77,24 @@ class Converter
         $data = [
             [
                 'type' => 'okTitle',
-                'label' => 'Commentary on',
+                'label' => __('commentary_on'),
                 'text' => $entry->title,
             ],
             [
                 'type' => 'okSummary',
                 'lines' => [
-                    'A commentary by '.$entry->assigned_authors->pluck('name')->join(', '),
-                    'Edited by '.$entry->assigned_editors->pluck('name')->join(', '),
+                    __('commentary_by').' '.$entry->assigned_authors->pluck('name')->join(', '),
+                    __('edited_by').' '.$entry->assigned_editors->pluck('name')->join(', '),
                 ],
             ],
             [
                 'type' => 'okSuggestedCitationLong',
-                'label' => 'Sugegsted Citation',
+                'label' => __('suggested_citation'),
                 'text' => $entry->suggested_citation_long,
             ],
             [
                 'type' => 'okSuggestedCitationShort',
-                'label' => 'Short Citation',
+                'label' => __('short_citation'),
                 'text' => $entry->suggested_citation_short,
             ],
             [
@@ -106,7 +108,7 @@ class Converter
             ],
             [
                 'type' => 'tableOfContents',
-                'label' => 'Table of Contents',
+                'label' => __('table_of_contents'),
             ],
             ...$entry->get('content') ?? [],
         ];
