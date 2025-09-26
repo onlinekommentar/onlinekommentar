@@ -11,7 +11,7 @@ class OaiXmlTransformer
         $writer->startElement('record');
 
         $writer->startElement('header');
-        $writer->writeElement('identifier', $data['identifier']);
+        $writer->writeElement('identifier', $data['identifiers'][0]);
         $writer->writeElement('datestamp', $data['datestamp']);
 
         foreach ($data['setSpecs'] as $setSpec) {
@@ -40,7 +40,6 @@ class OaiXmlTransformer
         $writer->writeAttribute('xsi:schemaLocation', 'http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd');
 
         $writer->writeElementNs('dc', 'title', null, $data['title']);
-        $writer->writeElementNs('dc', 'creator', null, $data['creator']);
 
         if ($data['subject']) {
             $writer->writeElementNs('dc', 'subject', null, $data['subject']);
@@ -52,6 +51,10 @@ class OaiXmlTransformer
 
         $writer->writeElementNs('dc', 'publisher', null, $data['publisher']);
 
+        foreach ($data['creators'] as $creator) {
+            $writer->writeElementNs('dc', 'creator', null, $creator['name']);
+        }
+
         foreach ($data['contributors'] as $contributor) {
             $writer->writeElementNs('dc', 'contributor', null, $contributor['name']);
         }
@@ -62,17 +65,16 @@ class OaiXmlTransformer
 
         $writer->writeElementNs('dc', 'type', null, $data['types']['dc']);
 
-        foreach ($data['sources'] as $source) {
-            $writer->writeElementNs('dc', 'format', null, $source['type']);
+        foreach ($data['relations'] as $relation) {
+            $writer->writeElementNs('dc', 'relation', null, $relation['url']);
         }
 
-        foreach ($data['sources'] as $source) {
-            $writer->writeElementNs('dc', 'source', null, $source['url']);
+        foreach ($data['identifiers'] as $identifier) {
+            $writer->writeElementNs('dc', 'identifier', null, $identifier);
         }
 
-        $writer->writeElementNs('dc', 'identifier', null, $data['identifier']);
         $writer->writeElementNs('dc', 'rights', null, $data['rights']);
-        $writer->writeElementNs('dc', 'coverage', null, $data['domain']);
+        $writer->writeElementNs('dc', 'coverage', null, $data['coverage']);
 
         $writer->writeElementNs('dc', 'language', null, $data['language']);
 
@@ -101,9 +103,16 @@ class OaiXmlTransformer
         $writer->endElement();
         $writer->endElement();
 
-        $writer->startElementNs('datacite', 'creator', null);
-        $writer->writeElementNs('datacite', 'creatorName', null, $data['creator']);
-        $writer->endElement();
+        if (! empty($data['creators'])) {
+            $writer->startElementNs('datacite', 'creators', null);
+            foreach ($data['creators'] as $creator) {
+                $writer->startElementNs('datacite', 'creator', null);
+                $writer->writeAttribute('creatorType', $creator['type']);
+                $writer->writeElementNs('datacite', 'creatorName', null, $creator['name']);
+                $writer->endElement();
+            }
+            $writer->endElement();
+        }
 
         if (! empty($data['contributors'])) {
             $writer->startElementNs('datacite', 'contributors', null);
@@ -127,19 +136,18 @@ class OaiXmlTransformer
         $writer->endElement();
         $writer->endElement();
 
-        $writer->startElementNs('datacite', 'identifier', null);
-        $writer->writeAttribute('identifierType', 'URL');
-        $writer->text($data['sources'][0]['url']);
-        $writer->endElement();
+        foreach ($data['identifiers'] as $identifier) {
+            $writer->startElementNs('datacite', 'identifier', null);
+            $writer->text($identifier);
+            $writer->endElement();
+        }
 
-        foreach ($data['sources'] as $source) {
-            if ($source['type'] !== 'text/html') {
-                $writer->startElementNs('oaire', 'file', null);
-                $writer->writeAttribute('objectType', 'fulltext');
-                $writer->writeAttribute('mimeType', $source['type']);
-                $writer->text($source['url']);
-                $writer->endElement();
-            }
+        foreach ($data['relations'] as $relation) {
+            $writer->startElementNs('oaire', 'file', null);
+            $writer->writeAttribute('objectType', 'fulltext');
+            $writer->writeAttribute('mimeType', $relation['type']);
+            $writer->text($relation['url']);
+            $writer->endElement();
         }
 
         $writer->startElementNs('datacite', 'rights', null);

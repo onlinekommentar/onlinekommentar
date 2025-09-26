@@ -44,15 +44,17 @@ class RecordResource implements Responsable
             }
         }
 
-        $contributors = [];
+        $creators = [];
         if ($entry->assigned_authors) {
             foreach ($entry->assigned_authors as $author) {
-                $contributors[] = [
+                $creators[] = [
                     'name' => $author->get('name'),
                     'type' => 'Author',
                 ];
             }
         }
+
+        $contributors = [];
         if ($entry->assigned_editors) {
             foreach ($entry->assigned_editors as $editor) {
                 $contributors[] = [
@@ -62,11 +64,12 @@ class RecordResource implements Responsable
             }
         }
 
-        $sources = [
-            [
-                'type' => 'text/html',
-                'url' => $entry->absoluteUrl(),
-            ],
+        $identifiers = [
+            "oai:{$domain}:commentary:{$entry->id}",
+            $entry->absoluteUrl(),
+        ];
+
+        $relations = [
             [
                 'type' => 'application/pdf',
                 'url' => route('commentaries.print', ['locale' => $entry->locale, 'commentarySlug' => $entry->slug]),
@@ -90,20 +93,20 @@ class RecordResource implements Responsable
             'language' => $entry->locale ?? 'en',
             'date' => $entry->date ? $entry->date->format('Y-m-d') : null,
             'publisher' => 'Onlinekommentar',
-            'creator' => 'Onlinekommentar',
-            'rights' => '© '.date('Y').', Onlinekommentar.ch',
+            'creators' => $creators,
+            'contributors' => $contributors,
+            'rights' => 'https://creativecommons.org/licenses/by/4.0/',
             'types' => [
-                'dc' => 'Text',
+                'dc' => 'commentary',
                 'openaire' => 'commentary',
                 'openaireGeneral' => 'literature',
                 'openaireUri' => 'http://purl.org/coar/resource_type/c_93fc',
             ],
             'description' => $entry->suggested_citation_long,
             'subject' => $subject,
-            'contributors' => $contributors,
-            'identifier' => "oai:{$domain}:commentary:{$entry->id}",
-            'sources' => $sources,
-            'domain' => $domain,
+            'identifiers' => $identifiers,
+            'relations' => $relations,
+            'coverage' => 'Law',
             'setSpecs' => $setSpecs,
             'datestamp' => $entry->date ? $entry->date->format('Y-m-d') : date('Y-m-d'),
         ];
