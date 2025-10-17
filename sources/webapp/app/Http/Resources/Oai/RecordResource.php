@@ -64,10 +64,11 @@ class RecordResource implements Responsable
             }
         }
 
-        $identifiers = [
+        $identifiers = array_filter([
             "oai:{$domain}:commentary:{$entry->id}",
+            $entry->doi,
             $entry->absoluteUrl(),
-        ];
+        ]);
 
         $relations = [
             [
