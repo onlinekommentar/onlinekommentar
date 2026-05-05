@@ -26,14 +26,6 @@ class CommentariesController extends Controller
     {
         $isLivePreview = request()->statamicToken();
 
-        // Create a unique cache key based on the request parameters
-        $cacheKey = "commentary_view:{$locale}:{$commentarySlug}:{$versionTimestamp}:".($versionComparisonResult ? md5($versionComparisonResult) : '');
-
-        // Check if the view is already cached
-        if (config('app.env') !== 'local' && ! $isLivePreview && Cache::has($cacheKey)) {
-            return Cache::get($cacheKey);
-        }
-
         // Handle Live Preview in CP
         if ($isLivePreview) {
             $livePreview = new LivePreview;
@@ -42,17 +34,29 @@ class CommentariesController extends Controller
         }
         // Handle frontend
         else {
-            if ($versionTimestamp) {
-                // locate the commentary with the given slug
-                $commentary = Entry::query()
-                    ->where('collection', 'commentaries')
-                    ->where('locale', $locale)
-                    ->where('slug', $commentarySlug)
-                    ->first()
-                    ->toArray();
+            // locate the commentary with the given slug
+            $entry = Entry::query()
+                ->where('collection', 'commentaries')
+                ->where('locale', $locale)
+                ->where('slug', $commentarySlug)
+                ->first();
 
+            // return 404 if commentary is not found
+            if (! $entry) {
+                abort(404);
+            }
+
+            // Create a unique cache key based on the request parameters
+            $cacheKey = "commentary_view:{$locale}:{$commentarySlug}:{$entry->get('updated_at')}:{$versionTimestamp}:".($versionComparisonResult ? md5($versionComparisonResult) : '');
+
+            // Check if the view is already cached
+            if (config('app.env') !== 'local' && Cache::has($cacheKey)) {
+                return Cache::get($cacheKey);
+            }
+
+            if ($versionTimestamp) {
                 // return 404 if revision file is not found
-                $commentaryRevisionBasePath = $this->_getCommentaryRevisionBasePath($locale, $commentary['id']);
+                $commentaryRevisionBasePath = $this->_getCommentaryRevisionBasePath($locale, $entry->id());
                 $revisionFile = $commentaryRevisionBasePath.'/'.$versionTimestamp.'.yaml';
                 if (! File::exists($revisionFile)) {
                     abort(404);
@@ -61,17 +65,7 @@ class CommentariesController extends Controller
                 // get the revision data for the given timestamp
                 $commentaryData = $this->_getRevisionDataFromRevisionFile($revisionFile, $locale);
             } else {
-                // get the commentary data for the given locale and slug
-                $commentaryData = Entry::query()
-                    ->where('collection', 'commentaries')
-                    ->where('locale', $locale)
-                    ->where('slug', $commentarySlug)
-                    ->first();
-                // return 404 if commentary is not found
-                if (! $commentaryData) {
-                    abort(404);
-                }
-                $commentaryData = $commentaryData->toArray();
+                $commentaryData = $entry->toArray();
             }
 
             // do not show unpublished commentaries to unauthenticated users on the frontend
