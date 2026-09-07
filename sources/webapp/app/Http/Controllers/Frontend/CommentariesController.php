@@ -269,6 +269,8 @@ class CommentariesController extends Controller
             $revisionData['content'] = $markupFixer->fix($revisionData['content']);
         }
 
+        $revisionData['last_modified'] = Carbon::createFromTimestamp($revision['date']);
+
         // include the human-readable timestamp of the revision in the revision data
         $revisionData['human_readable_timestamp'] = $this->_getLocaleFormattedTimestamp($revision['date'], $locale);
 
