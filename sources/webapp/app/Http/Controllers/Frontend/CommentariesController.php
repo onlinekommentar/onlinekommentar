@@ -47,7 +47,8 @@ class CommentariesController extends Controller
             }
 
             // Create a unique cache key based on the request parameters
-            $cacheKey = "commentary_view:{$locale}:{$commentarySlug}:{$entry->get('updated_at')}:{$versionTimestamp}:".($versionComparisonResult ? md5($versionComparisonResult) : '');
+            $navVersion = Cache::get('nav-version', 0);
+            $cacheKey = "commentary_view:{$locale}:{$commentarySlug}:{$entry->get('updated_at')}:{$navVersion}:{$versionTimestamp}:".($versionComparisonResult ? md5($versionComparisonResult) : '');
 
             // Check if the view is already cached
             if (config('app.env') !== 'local' && Cache::has($cacheKey)) {

@@ -18,5 +18,8 @@ class ClearNavCache
             $key = 'nav-'.$site->handle();
             Cache::forget($key);
         }
+
+        Cache::add('nav-version', 1);
+        Cache::increment('nav-version');
     }
 }
