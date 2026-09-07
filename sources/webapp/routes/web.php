@@ -4,7 +4,9 @@ use App\Http\Controllers\Frontend\CommentariesController;
 use App\Http\Controllers\Frontend\SearchController;
 use App\Http\Controllers\Frontend\UsersController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 use Statamic\Facades\Entry;
+use Statamic\Facades\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,6 +18,25 @@ use Statamic\Facades\Entry;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
+// local-only login bypass for development and automated testing
+if (app()->environment('local')) {
+    Route::get('/!/skip/{handle}', function ($handle) {
+        abort_unless(
+            Str::endsWith(request()->getHost(), ['.test', '.localhost', '.ts.net'])
+                || in_array(request()->getHost(), ['localhost', '127.0.0.1', '::1']),
+            404
+        );
+
+        $user = User::findByEmail("{$handle}@example.test");
+
+        abort_unless($user, 404);
+
+        auth()->login($user);
+
+        return redirect('/');
+    });
+}
 
 Route::get('/', function () {
     return redirect('/de');
