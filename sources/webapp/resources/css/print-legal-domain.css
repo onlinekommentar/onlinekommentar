@@ -1,0 +1,137 @@
+@import url('./print-shared.css');
+
+/* Page */
+
+@page {
+    size: 170mm 240mm;
+    margin: 20mm;
+    @footnote {
+        border-top: 0.5pt solid black;
+        padding-top: 0.5rem;
+        padding-left: 1.75rem;
+    }
+}
+
+@page :left {
+    margin-left: 16mm;
+    margin-right: 24mm;
+    @top-left {
+        content: string(article-title);
+        font-size: 0.8rem;
+        vertical-align: bottom;
+        padding-bottom: 5mm;
+    }
+    @bottom-left {
+        content: counter(page);
+        font-size: 0.8rem;
+        vertical-align: top;
+        padding-top: 5mm;
+    }
+    @bottom-center {
+        content: string(author-names);
+        font-size: 0.8rem;
+        vertical-align: top;
+        padding-top: 5mm;
+    }
+    @right-top { content: ''; background: white; }
+    @right-middle { content: ''; background: white; }
+    @right-bottom { content: ''; background: white; }
+}
+
+@page :right {
+    margin-left: 24mm;
+    margin-right: 16mm;
+    @top-right {
+        content: string(article-title);
+        font-size: 0.8rem;
+        vertical-align: bottom;
+        padding-bottom: 5mm;
+    }
+    @bottom-center {
+        content: string(author-names);
+        font-size: 0.8rem;
+        vertical-align: top;
+        padding-top: 5mm;
+    }
+    @bottom-right {
+        content: counter(page);
+        font-size: 0.8rem;
+        vertical-align: top;
+        padding-top: 5mm;
+    }
+    @left-top { content: ''; background: white; }
+    @left-middle { content: ''; background: white; }
+    @left-bottom { content: ''; background: white; }
+}
+
+@page toc-page {
+    @top-left { content: none; }
+    @top-right { content: none; }
+}
+
+/* Title Pages */
+
+.volume-page {
+    page: clear-page;
+    break-after: always;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    text-align: center;
+    > * + * {
+        margin-top: 1rem;
+    }
+    &-info {
+        font-size: 1.2rem;
+    }
+}
+
+/* Table of Contents */
+
+.entries-toc {
+    page: toc-page;
+    break-before: right;
+    > * + * {
+        margin-top: 0.75rem;
+    }
+    li + li {
+        margin-top: 0.35rem;
+    }
+    ol ol {
+        margin-left: 1rem;
+    }
+    .toc-group {
+        font-weight: bold;
+        text-align: center;
+        margin-top: 0.75rem;
+        > ol {
+            text-align: start;
+            margin-left: 0;
+        }
+    }
+    a {
+        text-decoration: none;
+        font-weight: normal;
+        &::after {
+            content: leader('.') ' ' target-counter(attr(href), page);
+        }
+    }
+}
+
+/* Content */
+
+.content {
+    .paragraph-nr--right {
+        left: auto;
+        right: -1.75rem;
+        text-align: left;
+    }
+}
+
+/* Section */
+
+.section {
+    break-before: always;
+}

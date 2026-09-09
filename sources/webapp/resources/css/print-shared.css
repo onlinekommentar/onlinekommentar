@@ -1,18 +1,33 @@
 @import url('./fonts.css');
 @import 'tailwindcss/base';
 
+/* Running Strings */
+
+.running-title { string-set: article-title content(); }
+.running-authors { string-set: author-names content(); }
+
+.running-title,
+.running-authors {
+    position: absolute;
+    clip: rect(0, 0, 0, 0);
+}
+
 /* Page */
 
-@page {
-    size: A4;
-    margin: 20mm;
-    @bottom-right {
-        content: counter(page) " / " counter(pages);
-        vertical-align: top;
-        padding-top: 5mm;
-        font-size: 0.8rem;
-    }
+@page :first {
+    @top-left { content: none; }
+    @top-right { content: none; }
 }
+
+@page clear-page {
+    @top-left { content: none; }
+    @top-right { content: none; }
+    @bottom-left { content: none; }
+    @bottom-center { content: none; }
+    @bottom-right { content: none; }
+}
+
+/* Typography */
 
 html {
     font-size: 10pt;
@@ -27,14 +42,6 @@ html {
 }
 
 /* Footnotes */
-
-@page {
-    @footnote {
-        border-top: 0.5pt solid black;
-        padding-top: 0.5rem;
-        padding-left: 1.75rem;
-    }
-}
 
 footnote {
     float: footnote;
@@ -55,9 +62,11 @@ footnote {
     left: 0;
 }
 
-/* Layout */
+/* Header */
 
 .header {
+    page: clear-page;
+    break-before: right;
     text-align: center;
     margin-bottom: 15mm;
     > * + * {
@@ -89,6 +98,28 @@ footnote {
     }
 }
 
+/* Table of Contents */
+
+.entry-toc {
+    page-break-before: always;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    > * + * {
+        margin-top: 0.75rem;
+    }
+    ul ul {
+        margin-left: 1rem;
+    }
+    a {
+        text-decoration: none;
+        &::after {
+            content: leader('.') ' ' target-counter(attr(href), page);
+        }
+    }
+}
+
+/* Metadata */
+
 .citation {
     margin-bottom: 1.5rem;
     > * + * {
@@ -111,30 +142,6 @@ footnote {
     }
 }
 
-.toc {
-    page-break-before: always;
-    margin-bottom: 1.5rem;
-    > * + * {
-        margin-top: 0.75rem;
-    }
-    &-label {
-        text-transform: uppercase;
-    }
-    &-list {
-        ul ul {
-            margin-left: 1rem;
-        }
-        a {
-            display: flex;
-            justify-content: space-between;
-            gap: 0.5rem;
-            &::after {
-                content: target-counter(attr(href), page);
-            }
-        }
-    }
-}
-
 /* Content */
 
 .content {
@@ -144,6 +151,11 @@ footnote {
     }
     p {
         text-align: justify;
+        orphans: 2;
+        widows: 2;
+        overflow-wrap: break-word;
+        hyphens: auto;
+        -webkit-hyphens: auto;
     }
     .paragraph-nr {
         width: 1rem;
@@ -158,14 +170,17 @@ footnote {
         font-size: 1.2rem;
         margin-top: 1.6rem;
         text-transform: uppercase;
+        break-after: avoid;
     }
     h3 {
         font-size: 1.2rem;
         margin-top: 1.2rem;
+        break-after: avoid;
     }
     h4, h5, h6 {
         margin-top: 1.1rem;
         font-size: 1.1rem;
+        break-after: avoid;
     }
     ul {
         list-style-type: disc;
@@ -182,5 +197,21 @@ footnote {
     }
     a {
         text-decoration: underline;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 0.75rem;
+        margin-bottom: 0.75rem;
+    }
+    th, td {
+        border: 1px solid black;
+        padding: 0.3rem 0.5rem;
+        text-align: left;
+        hyphens: auto;
+        overflow-wrap: break-word;
+    }
+    th {
+        font-weight: bold;
     }
 }
