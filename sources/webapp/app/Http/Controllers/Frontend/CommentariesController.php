@@ -64,7 +64,7 @@ class CommentariesController extends Controller
                 }
 
                 // get the revision data for the given timestamp
-                $commentaryData = $this->_getRevisionDataFromRevisionFile($revisionFile, $locale);
+                $commentaryData = $this->_getRevisionDataFromRevisionFile($revisionFile, $locale, $entry);
             } else {
                 $commentaryData = $entry->toArray();
             }
@@ -248,7 +248,7 @@ class CommentariesController extends Controller
         return Carbon::createFromTimestamp($timestamp)->isoFormat($format);
     }
 
-    private function _getRevisionDataFromRevisionFile($revisionFile, $locale)
+    private function _getRevisionDataFromRevisionFile($revisionFile, $locale, $entry)
     {
         // extract the revision data from the revision yaml file
         $yaml = YamlFacade::instance();
@@ -259,10 +259,26 @@ class CommentariesController extends Controller
         $revisionData['id'] = $revision['attributes']['id'];
         $revisionData['slug'] = $revision['attributes']['slug'];
 
+        // a revision stores only the fields that were in the working copy, so
+        // anything it does not carry comes from the entry it is a revision of
+        if (isset($revisionData['blueprint'])) {
+            $revisionData['blueprint'] = ['handle' => $revisionData['blueprint']];
+        }
+
+        if (empty($revisionData['blueprint'])) {
+            $revisionData['blueprint'] = ['handle' => $entry->blueprint()->handle()];
+
+            foreach (['title', 'content', 'legal_text', 'doi', 'original_language', 'assigned_authors', 'assigned_editors', 'suggested_citation_long', 'suggested_citation_short'] as $field) {
+                if (empty($revisionData[$field])) {
+                    $revisionData[$field] = $entry->value($field);
+                }
+            }
+        }
+
         // convert the structured data from the 'content' and 'legal_text' fields into html
         $modifiers = new CoreModifiers;
-        $revisionData['content'] = $modifiers->bardHtml($revisionData['content']);
-        $revisionData['legal_text'] = $modifiers->bardHtml($revisionData['legal_text']);
+        $revisionData['content'] = empty($revisionData['content']) ? null : $modifiers->bardHtml($revisionData['content']);
+        $revisionData['legal_text'] = empty($revisionData['legal_text']) ? null : $modifiers->bardHtml($revisionData['legal_text']);
 
         // add anchor attributes to the heading elements
         if ($revisionData['content']) {
