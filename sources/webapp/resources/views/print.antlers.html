@@ -1,8 +1,8 @@
 <!doctype html>
-<html class="text-{{ text }}">
+<html class="text-{{ text }}" lang="{{ locale }}">
   <head>
     <meta charset="utf-8">
-    <link rel="stylesheet" href="{{ config:app:url }}{{ mix src='css/print.css' }}">
+    <link rel="stylesheet" href="{{ config:app:url }}{{ mix src="css/{stylesheet}" }}">
   </head>
   <body>
     {{ template_content }}
