@@ -51,6 +51,8 @@ Route::get('{locale}/kommentare/{commentarySlug}/versions/{versionTimestamp}', [
 Route::get('{locale}/kommentare/{commentarySlug}', [CommentariesController::class, 'show']);
 // commentary print view
 Route::get('{locale}/kommentare/{commentarySlug}/print', [CommentariesController::class, 'print'])->name('commentaries.print');
+// commentary print HTML preview (used to debug the PDF source markup)
+Route::get('{locale}/kommentare/{commentarySlug}/print-preview', [CommentariesController::class, 'downloadPreview']);
 // commentary revision comparison (previously published version – revision timestamp selected)
 Route::get('{locale}/commentaries/{commentaryId}/revisions/{revisionTimestamp1}/compare/{revisionTimestamp2}/versions/{versionTimestamp}', [CommentariesController::class, 'compareRevisions']);
 // commentary revision comparison (latest published version – no revision timestamp selected)

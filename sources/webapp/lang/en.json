@@ -146,6 +146,14 @@
   "additional_documents": "Additional Documents",
   "download_pdf": "Download PDF",
 
+  "status_of_processing": "Status of processing:",
+  "generated_on": "PDF generated on:",
+  "last_change": "Last change:",
+  "volume": "Volume",
+  "full_table_of_contents": "Table of Contents",
+  "pdf_pending_title": "PDF being generated",
+  "pdf_pending_message": "The PDF is currently being generated. Please try again in a few minutes.",
+
   "print_commentary": "Print Commentary",
   "print": "Print",
   "printing": "Printing…",

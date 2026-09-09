@@ -145,6 +145,14 @@
   "additional_documents": "Additional Documents",
   "download_pdf": "Download PDF",
 
+  "status_of_processing": "Stand der Bearbeitung:",
+  "generated_on": "PDF erstellt am:",
+  "last_change": "Letzte Änderung:",
+  "volume": "Band",
+  "full_table_of_contents": "Inhaltsverzeichnis",
+  "pdf_pending_title": "PDF wird erstellt",
+  "pdf_pending_message": "Das PDF wird gerade erstellt. Bitte versuchen Sie es in ein paar Minuten erneut.",
+
   "print_commentary": "Kommentar drucken",
   "print": "Drucken",
   "printing": "Printing…",

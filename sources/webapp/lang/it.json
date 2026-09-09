@@ -144,6 +144,14 @@
   "additional_documents": "Additional Documents",
   "download_pdf": "Download PDF",
 
+  "status_of_processing": "Stato dell'elaborazione:",
+  "generated_on": "PDF creato il:",
+  "last_change": "Ultima modifica:",
+  "volume": "Volume",
+  "full_table_of_contents": "Indice",
+  "pdf_pending_title": "PDF in fase di creazione",
+  "pdf_pending_message": "Il PDF è in fase di creazione. La preghiamo di riprovare tra qualche minuto.",
+
   "footnotes": "Note a piè di pagina",
 
   "print_commentary": "Stampa il commento",

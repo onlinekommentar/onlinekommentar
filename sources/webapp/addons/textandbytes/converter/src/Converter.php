@@ -134,32 +134,52 @@ class Converter
 
     public function entryToHtml($entry, $params = [])
     {
-        $markupFixer = new MarkupFixer;
-        $content = $markupFixer->fix($entry->content);
+        return $this->withLocale($entry->locale(), function () use ($entry, $params) {
+            $content = $this->renderEntryContent($entry);
 
-        $tocGenerator = new TocGenerator;
-        $toc = $tocGenerator->getHtmlMenu($content);
+            $toc = (new TocGenerator)->getHtmlMenu($content);
 
-        return $this->withLocale($entry->locale(), fn () => (new View)
-            ->template('commentaries.print')
-            ->layout('print')
-            ->cascadeContent($entry)
-            ->with([
-                'content' => $content,
-                'toc' => $toc,
-                ...$params,
-            ])
-            ->render());
+            return (new View)
+                ->template('commentaries.print')
+                ->layout('print')
+                ->cascadeContent($entry)
+                ->with([
+                    'content' => $content,
+                    'toc' => $toc,
+                    'stylesheet' => 'print-commentary.css',
+                    'locale' => $entry->locale(),
+                    'generation_date' => now()->format('d.m.Y'),
+                    ...$params,
+                ])
+                ->render();
+        });
     }
 
     public function entryToHtmlPdf($entry, $params = [])
     {
         $html = $this->entryToHtml($entry, $params);
 
+        return $this->renderWeasyPdf($html, 300);
+    }
+
+    public function renderEntryContent($entry): string
+    {
+        $html = (new View)
+            ->template('commentaries.print-content')
+            ->cascadeContent($entry)
+            ->render();
+
+        return (new MarkupFixer)->fix($html);
+    }
+
+    public function renderWeasyPdf(string $html, int $timeout = 30): string
+    {
         $pdfFile = storage_path('app').'/weasyprint-'.uniqid().'.pdf';
 
         $pdf = new Pdf(config('services.weasyprint.bin'));
-        $pdf->setTimeout(30);
+        $pdf->setTimeout($timeout);
+        $pdf->setOption('pdf-variant', 'pdf/x-4');
+        $pdf->setOption('full-fonts', true);
         $pdf->generateFromHtml($html, $pdfFile);
 
         return $pdfFile;

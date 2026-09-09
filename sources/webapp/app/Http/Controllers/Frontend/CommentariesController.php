@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\GenerateCommentaryPdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Jfcherng\Diff\Differ;
 use Jfcherng\Diff\Factory\RendererFactory;
 use Jfcherng\Diff\Renderer\RendererConstant;
@@ -400,19 +402,52 @@ class CommentariesController extends Controller
             ->where('slug', $commentarySlug)
             ->first();
 
-        $cacheKey = "commentary_print:{$locale}:{$commentarySlug}:{$entry->get('updated_at')}";
+        if (! $entry) {
+            abort(404);
+        }
 
-        if (config('app.env') !== 'local' && Cache::has($cacheKey)) {
-            $file = Cache::get($cacheKey);
-
-            return response()
-                ->file($file, [
-                    'Content-Type' => 'application/pdf',
-                    'Content-Disposition' => 'inline; filename="'.$commentarySlug.'.pdf"',
-                ]);
+        if ($entry['status'] !== 'published' && ! User::current()) {
+            abort(404);
         }
 
         app()->setLocale($locale);
+
+        $size = in_array($request->text, ['md', 'lg']) ? $request->text : 'md';
+
+        $disk = Storage::disk('pdf');
+        $path = "commentary/{$locale}/{$size}/{$commentarySlug}.pdf";
+
+        if ($disk->exists($path) && $disk->lastModified($path) < $entry->lastModified()->getTimestamp()) {
+            $disk->delete($path);
+        }
+
+        if ($disk->exists($path)) {
+            return response()->file($disk->path($path), [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => "inline; filename=\"{$commentarySlug}.pdf\"",
+                'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+                'Pragma' => 'no-cache',
+            ]);
+        }
+
+        GenerateCommentaryPdf::dispatch($entry->id(), $locale, $size);
+
+        return (new View)
+            ->template('commentaries/print-pending')
+            ->layout('layout')
+            ->with(['title' => __('pdf_pending_title'), 'locale' => $locale])
+            ->render();
+    }
+
+    public function downloadPreview(Request $request, $locale, $commentarySlug)
+    {
+        abort_unless(app()->environment('local'), 404);
+
+        $entry = Entry::query()
+            ->where('collection', 'commentaries')
+            ->where('locale', $locale)
+            ->where('slug', $commentarySlug)
+            ->first();
 
         if (! $entry) {
             abort(404);
@@ -422,22 +457,8 @@ class CommentariesController extends Controller
             abort(404);
         }
 
-        // return (new Converter)->entryToHtml($entry, [
-        //     'text' => $request->text ?? 'md',
-        // ]);
-
-        $file = (new Converter)->entryToHtmlPdf($entry, [
+        return (new Converter)->entryToHtml($entry, [
             'text' => $request->text ?? 'md',
         ]);
-
-        if (config('app.env') !== 'local') {
-            Cache::put($cacheKey, $file, now()->addDays(7));
-        }
-
-        return response()
-            ->file($file, [
-                'Content-Type' => 'application/pdf',
-                'Content-Disposition' => 'inline; filename="'.$commentarySlug.'.pdf"',
-            ]);
     }
 }
