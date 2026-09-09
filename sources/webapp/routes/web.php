@@ -45,6 +45,8 @@ Route::get('/', function () {
 // author and editor detail views
 Route::get('{locale}/{usersType}/{slug}', [UsersController::class, 'show'])->whereIn('usersType', ['autoren', 'herausgeber']);
 
+// legal domain PDF download
+Route::get('{locale}/kommentare/{legalDomainSlug}/pdf', [CommentariesController::class, 'downloadLegalDomainPdf']);
 // commentary revision detail view
 Route::get('{locale}/kommentare/{commentarySlug}/versions/{versionTimestamp}', [CommentariesController::class, 'show']);
 // commentary detail view

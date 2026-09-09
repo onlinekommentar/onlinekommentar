@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Jobs\GenerateCommentaryPdf;
+use App\Jobs\GenerateLegalDomainPdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -21,6 +22,7 @@ use Statamic\View\View;
 use Textandbytes\Converter\Converter;
 use TOC\MarkupFixer;
 use TOC\TocGenerator;
+use ZipStream\ZipStream;
 
 class CommentariesController extends Controller
 {
@@ -437,6 +439,82 @@ class CommentariesController extends Controller
             ->layout('layout')
             ->with(['title' => __('pdf_pending_title'), 'locale' => $locale])
             ->render();
+    }
+
+    public function downloadLegalDomainPdf($locale, $legalDomainSlug)
+    {
+        $entry = Entry::query()
+            ->where('collection', 'commentaries')
+            ->where('locale', $locale)
+            ->where('slug', $legalDomainSlug)
+            ->first();
+
+        if (! $entry || $entry->blueprint()->handle() !== 'legal_domain') {
+            abort(404);
+        }
+
+        if ($entry['status'] !== 'published' && ! User::current()) {
+            abort(404);
+        }
+
+        $disk = Storage::disk('pdf');
+        $dir = "legal-domain/{$locale}/{$legalDomainSlug}";
+        $manifestPath = "{$dir}/manifest.json";
+
+        if (! $disk->exists($manifestPath)) {
+            GenerateLegalDomainPdf::dispatch($entry->id(), $locale);
+
+            return (new View)
+                ->template('commentaries/print-pending')
+                ->layout('layout')
+                ->with(['title' => __('pdf_pending_title'), 'locale' => $locale])
+                ->render();
+        }
+
+        $files = json_decode($disk->get($manifestPath), true)['files'] ?? [];
+
+        if (count($files) === 0) {
+            GenerateLegalDomainPdf::dispatch($entry->id(), $locale);
+
+            return (new View)
+                ->template('commentaries/print-pending')
+                ->layout('layout')
+                ->with(['title' => __('pdf_pending_title'), 'locale' => $locale])
+                ->render();
+        }
+
+        if (count($files) === 1) {
+            $filePath = $disk->path("{$dir}/{$files[0]}");
+
+            if (! file_exists($filePath)) {
+                abort(404);
+            }
+
+            return response()->file($filePath, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => "inline; filename=\"{$files[0]}\"",
+                'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+                'Pragma' => 'no-cache',
+            ]);
+        }
+
+        return response()->stream(function () use ($disk, $dir, $files, $legalDomainSlug) {
+            $zip = new ZipStream(
+                outputName: "{$legalDomainSlug}.zip",
+                sendHttpHeaders: false,
+            );
+
+            foreach ($files as $filename) {
+                $zip->addFileFromPath($filename, $disk->path("{$dir}/{$filename}"));
+            }
+
+            $zip->finish();
+        }, 200, [
+            'Content-Type' => 'application/zip',
+            'Content-Disposition' => "attachment; filename=\"{$legalDomainSlug}.zip\"",
+            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+            'Pragma' => 'no-cache',
+        ]);
     }
 
     public function downloadPreview(Request $request, $locale, $commentarySlug)

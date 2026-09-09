@@ -51,4 +51,11 @@ $commentaries = collect($tree)
   title="{{ title }}"
   :commentaries='<?= json_encode($commentaries, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT) ?>'
   :legal-domains='<?= json_encode([]) ?>'>
+<?php if (($blueprint['handle'] ?? null) === 'legal_domain'): ?>
+    <template v-slot:header>
+        <a href="/<?= $locale ?>/kommentare/<?= $slug ?>/pdf" class="ok-button">
+            <?= __('download_pdf') ?>
+        </a>
+    </template>
+<?php endif; ?>
 </commentaries>

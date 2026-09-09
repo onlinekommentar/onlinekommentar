@@ -35,6 +35,9 @@
     <div v-if="showTitleLine" class="px-4 bg-white md:px-12 lg:px-24 xl:px-32 lg:py-12 border-b border-black">
       <div class="flex flex-col items-center">
         <div class="font-serif text-3xl md:text-4xl xl:text-5xl text-center">{{ title }}</div>
+        <div class="mt-4">
+          <slot name="header"></slot>
+        </div>
       </div>
     </div>
 

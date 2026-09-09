@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "afb0be12fee1373c27a68a99d31f1097",
+    "content-hash": "00c3277b8abf30e553237ad177d6005e",
     "packages": [
         {
             "name": "ajthinking/archetype",
@@ -1661,6 +1661,60 @@
                 "source": "https://github.com/jacksleight/statamic-bard-texstyle/tree/3.5.6"
             },
             "time": "2025-07-04T13:58:53+00:00"
+        },
+        {
+            "name": "jacksleight/statamic-distill",
+            "version": "1.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jacksleight/statamic-distill.git",
+                "reference": "34f034728a6e04269a46fd7c3a221f473bc7f384"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jacksleight/statamic-distill/zipball/34f034728a6e04269a46fd7c3a221f473bc7f384",
+                "reference": "34f034728a6e04269a46fd7c3a221f473bc7f384",
+                "shasum": ""
+            },
+            "require": {
+                "statamic/cms": "^5.0|^6.0"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.21",
+                "nunomaduro/collision": "^8.0",
+                "orchestra/testbench": "^10.0",
+                "pestphp/pest": "^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "JackSleight\\StatamicDistill\\ServiceProvider",
+                        "JackSleight\\StatamicDistill\\StillServiceProvider"
+                    ]
+                },
+                "statamic": {
+                    "name": "Distill",
+                    "description": "This Statamic addon allows you to filter, fetch or index the individual values, sets and relations within your entries, from both root and deeply nested fields."
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JackSleight\\StatamicDistill\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "support": {
+                "issues": "https://github.com/jacksleight/statamic-distill/issues",
+                "source": "https://github.com/jacksleight/statamic-distill/tree/1.3.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/jacksleight",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-08-24T08:22:16+00:00"
         },
         {
             "name": "james-heinrich/getid3",
@@ -8626,7 +8680,7 @@
         },
         {
             "name": "textandbytes/converter",
-            "version": "dev-master",
+            "version": "dev-feature/platform-improvements",
             "dist": {
                 "type": "path",
                 "url": "addons/textandbytes/converter",
@@ -8664,7 +8718,7 @@
         },
         {
             "name": "textandbytes/footnotes",
-            "version": "dev-master",
+            "version": "dev-feature/platform-improvements",
             "dist": {
                 "type": "path",
                 "url": "addons/textandbytes/footnotes",
