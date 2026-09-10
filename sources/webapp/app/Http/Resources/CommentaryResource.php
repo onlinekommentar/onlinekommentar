@@ -9,6 +9,15 @@ use Statamic\Facades\Entry as EntryFacade;
 
 class CommentaryResource extends JsonResource
 {
+    protected bool $detailed = false;
+
+    public function detailed(bool $detailed = true): static
+    {
+        $this->detailed = $detailed;
+
+        return $this;
+    }
+
     public function toArray(Request $request): array
     {
         $entry = $this->resource;
@@ -25,7 +34,7 @@ class CommentaryResource extends JsonResource
             'html_link' => $entry->absoluteUrl(),
             'pdf_link' => route('commentaries.print', ['locale' => $entry->locale, 'commentarySlug' => $entry->slug]),
             'additional_document_links' => $this->transformAssets($entry->additional_documents)->all(),
-            $this->mergeWhen($request->routeIs('api.commentaries.show'), [
+            $this->mergeWhen($this->detailed, [
                 'suggested_citation_long' => $entry->suggested_citation_long,
                 'suggested_citation_short' => $entry->suggested_citation_short,
                 'content' => $entry->content,
