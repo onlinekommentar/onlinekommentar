@@ -126,14 +126,15 @@ class Converter
     {
         $wordFile = $this->entryToWord($entry);
 
-        $dir = storage_path('app');
-        $request = Gotenberg::libreOffice(config('services.gotenberg.url'))
-            ->convert(Stream::path($wordFile));
-        $pdfFile = $dir.'/'.Gotenberg::save($request, $dir);
+        try {
+            $dir = storage_path('app');
+            $request = Gotenberg::libreOffice(config('services.gotenberg.url'))
+                ->convert(Stream::path($wordFile));
 
-        unlink($wordFile);
-
-        return $pdfFile;
+            return $dir.'/'.Gotenberg::save($request, $dir);
+        } finally {
+            unlink($wordFile);
+        }
     }
 
     public function entryToHtml($entry, $params = [])
