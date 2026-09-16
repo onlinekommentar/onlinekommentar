@@ -144,6 +144,14 @@
     "additional_documents": "Additional Documents",
     "download_pdf": "Download PDF",
 
+    "status_of_processing": "État du traitement :",
+    "generated_on": "PDF créé le :",
+    "last_change": "Dernière modification :",
+    "volume": "Volume",
+    "full_table_of_contents": "Table des matières",
+    "pdf_pending_title": "PDF en cours de création",
+    "pdf_pending_message": "Le PDF est en cours de création. Veuillez réessayer dans quelques minutes.",
+
     "footnotes": "Notes de bas de page",
 
     "print_commentary": "Imprimer le commentaire",

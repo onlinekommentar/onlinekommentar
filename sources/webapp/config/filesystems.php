@@ -42,6 +42,12 @@ return [
             'throw' => false,
         ],
 
+        'pdf' => [
+            'driver' => 'local',
+            'root' => storage_path('app/pdf'),
+            'throw' => false,
+        ],
+
         'pdf_commentaries' => [
             'driver' => 'local',
             'root' => base_path('data/storage/app/public/commentaries/pdf'),

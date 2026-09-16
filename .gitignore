@@ -1,6 +1,6 @@
 provisioning/remote
 sources/webapp/content/*
-sources/webapp/data/*
+sources/webapp/data/
 sources/webapp/revisions/*
 sources/webapp/users/*.yaml
 sources/webapp/vendor/
@@ -9,7 +9,8 @@ sources/webapp/npm-debug.log
 sources/webapp/yarn-error.log
 sources/webapp/app/storage/
 sources/webapp/public/css/app.css
-sources/webapp/public/css/print.css
+sources/webapp/public/css/print-commentary.css
+sources/webapp/public/css/print-legal-domain.css
 sources/webapp/public/js/app.js
 sources/webapp/public/js/manifest.js
 sources/webapp/public/js/vendor.js
@@ -31,6 +32,8 @@ sources/webapp/.phpunit.result.cache
 /.vscode
 .DS_Store
 sources/webapp/public/css/app.css.map
+sources/webapp/public/css/print-commentary.css.map
+sources/webapp/public/css/print-legal-domain.css.map
 sources/webapp/public/js/app.js.map
 sources/webapp/public/js/*
 sources/webapp/public/vendor/app/js/*

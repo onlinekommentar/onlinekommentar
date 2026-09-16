@@ -5,7 +5,10 @@ namespace Textandbytes\Converter;
 use Gotenberg\Gotenberg;
 use Gotenberg\Stream;
 use Illuminate\Support\Traits\Localizable;
+use JackSleight\StatamicDistill\Facades\Distill;
+use Cocur\Slugify\SlugifyInterface;
 use Pontedilana\PhpWeasyPrint\Pdf;
+use Statamic\Entries\Entry;
 use Statamic\Support\Str;
 use Statamic\View\View;
 use Textandbytes\Converter\Marks\ParagraphNumber;
@@ -15,11 +18,13 @@ use Tiptap\Editor;
 use Tiptap\Marks;
 use Tiptap\Nodes;
 use TOC\MarkupFixer;
-use TOC\TocGenerator;
 
 class Converter
 {
     use Localizable;
+
+    // If the page layout changes run `herd php artisan converter:calibrate-pdf-estimator` to recalculate these numbers
+    const WORDS_PER_PAGE = 310;
 
     public function htmlToProsemirror($html)
     {
@@ -122,47 +127,201 @@ class Converter
     {
         $wordFile = $this->entryToWord($entry);
 
-        $dir = storage_path('app');
-        $request = Gotenberg::libreOffice(config('services.gotenberg.url'))
-            ->convert(Stream::path($wordFile));
-        $pdfFile = $dir.'/'.Gotenberg::save($request, $dir);
+        try {
+            $dir = storage_path('app');
+            $request = Gotenberg::libreOffice(config('services.gotenberg.url'))
+                ->convert(Stream::path($wordFile));
 
-        unlink($wordFile);
-
-        return $pdfFile;
+            return $dir.'/'.Gotenberg::save($request, $dir);
+        } finally {
+            unlink($wordFile);
+        }
     }
 
     public function entryToHtml($entry, $params = [])
     {
-        $markupFixer = new MarkupFixer;
-        $content = $markupFixer->fix($entry->content);
+        return $this->withLocale($entry->locale(), function () use ($entry, $params) {
+            $content = $this->renderEntryContent($entry);
 
-        $tocGenerator = new TocGenerator;
-        $toc = $tocGenerator->getHtmlMenu($content);
+            $toc = (new TocBuilder)->build($content);
 
-        return $this->withLocale($entry->locale(), fn () => (new View)
-            ->template('commentaries.print')
-            ->layout('print')
-            ->cascadeContent($entry)
-            ->with([
-                'content' => $content,
-                'toc' => $toc,
-                ...$params,
-            ])
-            ->render());
+            return (new View)
+                ->template('commentaries.print')
+                ->layout('print')
+                ->cascadeContent($entry)
+                ->with([
+                    'content' => $content,
+                    'toc' => $toc,
+                    'stylesheet' => 'print-commentary.css',
+                    'locale' => $entry->locale(),
+                    'generation_date' => now()->format('d.m.Y'),
+                    ...$params,
+                ])
+                ->render();
+        });
     }
 
     public function entryToHtmlPdf($entry, $params = [])
     {
         $html = $this->entryToHtml($entry, $params);
 
+        return $this->renderWeasyPdf($html, 300);
+    }
+
+    public function entriesToHtml(array $entries, $tocPages, string $locale, int $volumeNumber, int $totalVolumes, string $generationDate, ?string $legalDomainTitle = null, ?string $lastChangeDate = null): string
+    {
+        return $this->withLocale($locale, function () use ($entries, $tocPages, $locale, $volumeNumber, $totalVolumes, $generationDate, $legalDomainTitle, $lastChangeDate) {
+            $entryIds = collect($entries)->map(fn ($e) => $e->id())->all();
+            $slugifier = new SharedUniqueSlugifier;
+
+            $entryData = collect($entries)->map(function ($entry) use ($slugifier) {
+                $html = $this->renderEntryContent($entry, $slugifier);
+                $html = preg_replace(
+                    '/<span class="paragraph-nr">([^<]+)<\/span>/',
+                    '<span class="paragraph-nr">$1</span><span class="paragraph-nr paragraph-nr--right">$1</span>',
+                    $html
+                );
+                $toc = (new TocBuilder)->build($html);
+
+                return array_merge($entry->toAugmentedArray(), [
+                    'toc' => $toc,
+                    'rendered_content' => $html,
+                ]);
+            })->all();
+
+            $tocTree = $this->buildTocTree($tocPages, $entryIds);
+            $tocHtml = $this->renderTocTree($tocTree);
+
+            return (new View)
+                ->template('commentaries.print-full')
+                ->layout('print')
+                ->with([
+                    'entries' => $entryData,
+                    'toc_html' => $tocHtml,
+                    'volume_number' => $volumeNumber,
+                    'total_volumes' => $totalVolumes,
+                    'generation_date' => $generationDate,
+                    'legal_domain_title' => $legalDomainTitle,
+                    'last_change_date' => $lastChangeDate,
+                    'stylesheet' => 'print-legal-domain.css',
+                    'locale' => $locale,
+                    'text' => 'md',
+                ])
+                ->render();
+        });
+    }
+
+    public function entriesToHtmlPdf(array $entries, $tocPages, string $locale, int $volumeNumber, int $totalVolumes, string $generationDate, ?string $legalDomainTitle = null, ?string $lastChangeDate = null): string
+    {
+        $html = $this->entriesToHtml($entries, $tocPages, $locale, $volumeNumber, $totalVolumes, $generationDate, $legalDomainTitle, $lastChangeDate);
+
+        return $this->renderWeasyPdf($html, 600);
+    }
+
+    public function renderEntryContent($entry, ?SlugifyInterface $slugifier = null): string
+    {
+        $html = (new View)
+            ->template('commentaries.print-content')
+            ->cascadeContent($entry)
+            ->render();
+
+        return (new MarkupFixer(null, $slugifier))->fix($html);
+    }
+
+    public function renderWeasyPdf(string $html, int $timeout = 30): string
+    {
         $pdfFile = storage_path('app').'/weasyprint-'.uniqid().'.pdf';
 
         $pdf = new Pdf(config('services.weasyprint.bin'));
-        $pdf->setTimeout(30);
+        $pdf->setTimeout($timeout);
+        $pdf->setOption('pdf-variant', 'pdf/x-4');
+        $pdf->setOption('full-fonts', true);
         $pdf->generateFromHtml($html, $pdfFile);
 
         return $pdfFile;
+    }
+
+    public function getEntryContentCounts(Entry $entry): array
+    {
+        preg_match_all('/\p{L}+/u', Distill::text($entry->augmentedValue('content')), $matches);
+
+        return [
+            'words' => count($matches[0]),
+        ];
+    }
+
+    public function estimateEntryPages(Entry $entry): float
+    {
+        $counts = $this->getEntryContentCounts($entry);
+
+        $pages = $counts['words'] / static::WORDS_PER_PAGE
+            + 1    // entry title page
+            + 2.5  // entry TOC
+            + 1.5; // blank page padding for odd-page starts
+
+        return max($pages, 1);
+    }
+
+    public static function estimateVolumeOverheadPages(): float
+    {
+        return 1   // volume title page
+            + 1;   // volume TOC
+    }
+
+    protected function renderTocTree(array $items): string
+    {
+        $html = '<ol>';
+
+        foreach ($items as $item) {
+            if ($item['type'] === 'group') {
+                $html .= '<li class="toc-group">'.e($item['title']);
+                $html .= $this->renderTocTree($item['children']);
+                $html .= '</li>';
+            } else {
+                $html .= '<li><a href="#entry-'.$item['id'].'">'.e($item['title']).'</a>';
+                if (! empty($item['children'])) {
+                    $html .= $this->renderTocTree($item['children']);
+                }
+                $html .= '</li>';
+            }
+        }
+
+        $html .= '</ol>';
+
+        return $html;
+    }
+
+    protected function buildTocTree($pages, array $entryIds): array
+    {
+        $tree = [];
+
+        foreach ($pages->all() as $page) {
+            $entry = $page->entry();
+
+            if (! $entry || ! $entry->published()) {
+                continue;
+            }
+
+            $blueprint = $entry->blueprint()->handle();
+            $children = $this->buildTocTree($page->pages(), $entryIds);
+
+            if ($blueprint === 'commentary' && in_array($entry->id(), $entryIds)) {
+                $tree[] = [
+                    'type' => 'entry',
+                    'id' => $entry->id(),
+                    'title' => $entry->get('title'),
+                    'children' => $children,
+                ];
+            } elseif (! empty($children)) {
+                $tree[] = [
+                    'type' => 'group',
+                    'title' => $entry->get('title'),
+                    'children' => $children,
+                ];
+            }
+        }
+
+        return $tree;
     }
 
     protected function makeParagraph($text)

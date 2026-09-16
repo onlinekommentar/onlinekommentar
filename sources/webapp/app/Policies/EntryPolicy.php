@@ -33,10 +33,18 @@ class EntryPolicy
         $user = User::fromUser($user);
 
         if ($entry->collectionHandle() == 'commentaries') {
-            $assigned_authors = $entry->assigned_authors->pluck('id')->toArray();
-            $assigned_editors = $entry->assigned_editors->pluck('id')->toArray();
+            if ($user->toArray()['is_admin']) {
+                return true;
+            }
 
-            return $user->toArray()['is_admin'] || (in_array($user->id, $assigned_editors) || in_array($user->id, $assigned_authors));
+            if ($entry->blueprint()->hasField('assigned_authors') === false) {
+                return false;
+            }
+
+            return collect(['assigned_authors', 'assigned_editors'])
+                ->flatMap(fn ($field) => collect($entry->value($field)))
+                ->filter()
+                ->contains($user->id);
         } else {
             if ($this->hasAnotherAuthor($user, $entry)) {
                 return $user->hasPermission("edit other authors {$entry->collectionHandle()} entries");

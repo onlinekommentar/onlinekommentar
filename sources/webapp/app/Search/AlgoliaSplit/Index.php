@@ -20,7 +20,9 @@ class Index extends StatamicIndex
 
         if (isset($this->config['split'])) {
             $documents = $documents->flatMap(fn ($item) => $this->splitDocument($item, $this->config['split']));
-            $this->cleanupSplitDocuments($documents);
+            if ($this->exists()) {
+                $this->cleanupSplitDocuments($documents);
+            }
             $this->configureSplitIndex();
         }
 
@@ -63,7 +65,7 @@ class Index extends StatamicIndex
     protected function configureSplitIndex()
     {
         try {
-            $settings = $this->getIndex()->getSettings();
+            $settings = $this->exists() ? $this->getIndex()->getSettings() : [];
             $this->getIndex()->setSettings([
                 'distinct' => true,
                 'attributeForDistinct' => 'sourceID',

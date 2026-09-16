@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\GenerateCommentaryPdf;
+use App\Jobs\GenerateLegalDomainPdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Jfcherng\Diff\Differ;
 use Jfcherng\Diff\Factory\RendererFactory;
 use Jfcherng\Diff\Renderer\RendererConstant;
@@ -19,6 +22,7 @@ use Statamic\View\View;
 use Textandbytes\Converter\Converter;
 use TOC\MarkupFixer;
 use TOC\TocGenerator;
+use ZipStream\ZipStream;
 
 class CommentariesController extends Controller
 {
@@ -47,7 +51,8 @@ class CommentariesController extends Controller
             }
 
             // Create a unique cache key based on the request parameters
-            $cacheKey = "commentary_view:{$locale}:{$commentarySlug}:{$entry->get('updated_at')}:{$versionTimestamp}:".($versionComparisonResult ? md5($versionComparisonResult) : '');
+            $navVersion = Cache::get('nav-version', 0);
+            $cacheKey = "commentary_view:{$locale}:{$commentarySlug}:{$entry->get('updated_at')}:{$navVersion}:{$versionTimestamp}:".($versionComparisonResult ? md5($versionComparisonResult) : '');
 
             // Check if the view is already cached
             if (config('app.env') !== 'local' && Cache::has($cacheKey)) {
@@ -63,7 +68,7 @@ class CommentariesController extends Controller
                 }
 
                 // get the revision data for the given timestamp
-                $commentaryData = $this->_getRevisionDataFromRevisionFile($revisionFile, $locale);
+                $commentaryData = $this->_getRevisionDataFromRevisionFile($revisionFile, $locale, $entry);
             } else {
                 $commentaryData = $entry->toArray();
             }
@@ -247,7 +252,7 @@ class CommentariesController extends Controller
         return Carbon::createFromTimestamp($timestamp)->isoFormat($format);
     }
 
-    private function _getRevisionDataFromRevisionFile($revisionFile, $locale)
+    private function _getRevisionDataFromRevisionFile($revisionFile, $locale, $entry)
     {
         // extract the revision data from the revision yaml file
         $yaml = YamlFacade::instance();
@@ -258,16 +263,34 @@ class CommentariesController extends Controller
         $revisionData['id'] = $revision['attributes']['id'];
         $revisionData['slug'] = $revision['attributes']['slug'];
 
+        // a revision stores only the fields that were in the working copy, so
+        // anything it does not carry comes from the entry it is a revision of
+        if (isset($revisionData['blueprint'])) {
+            $revisionData['blueprint'] = ['handle' => $revisionData['blueprint']];
+        }
+
+        if (empty($revisionData['blueprint'])) {
+            $revisionData['blueprint'] = ['handle' => $entry->blueprint()->handle()];
+
+            foreach (['title', 'content', 'legal_text', 'doi', 'original_language', 'assigned_authors', 'assigned_editors', 'suggested_citation_long', 'suggested_citation_short'] as $field) {
+                if (empty($revisionData[$field])) {
+                    $revisionData[$field] = $entry->value($field);
+                }
+            }
+        }
+
         // convert the structured data from the 'content' and 'legal_text' fields into html
         $modifiers = new CoreModifiers;
-        $revisionData['content'] = $modifiers->bardHtml($revisionData['content']);
-        $revisionData['legal_text'] = $modifiers->bardHtml($revisionData['legal_text']);
+        $revisionData['content'] = empty($revisionData['content']) ? null : $modifiers->bardHtml($revisionData['content']);
+        $revisionData['legal_text'] = empty($revisionData['legal_text']) ? null : $modifiers->bardHtml($revisionData['legal_text']);
 
         // add anchor attributes to the heading elements
         if ($revisionData['content']) {
             $markupFixer = new MarkupFixer;
             $revisionData['content'] = $markupFixer->fix($revisionData['content']);
         }
+
+        $revisionData['last_modified'] = Carbon::createFromTimestamp($revision['date']);
 
         // include the human-readable timestamp of the revision in the revision data
         $revisionData['human_readable_timestamp'] = $this->_getLocaleFormattedTimestamp($revision['date'], $locale);
@@ -381,19 +404,128 @@ class CommentariesController extends Controller
             ->where('slug', $commentarySlug)
             ->first();
 
-        $cacheKey = "commentary_print:{$locale}:{$commentarySlug}:{$entry->get('updated_at')}";
+        if (! $entry) {
+            abort(404);
+        }
 
-        if (config('app.env') !== 'local' && Cache::has($cacheKey)) {
-            $file = Cache::get($cacheKey);
-
-            return response()
-                ->file($file, [
-                    'Content-Type' => 'application/pdf',
-                    'Content-Disposition' => 'inline; filename="'.$commentarySlug.'.pdf"',
-                ]);
+        if ($entry['status'] !== 'published' && ! User::current()) {
+            abort(404);
         }
 
         app()->setLocale($locale);
+
+        $size = in_array($request->text, ['md', 'lg']) ? $request->text : 'md';
+
+        $disk = Storage::disk('pdf');
+        $path = "commentary/{$locale}/{$size}/{$commentarySlug}.pdf";
+
+        if ($disk->exists($path) && $disk->lastModified($path) < $entry->lastModified()->getTimestamp()) {
+            $disk->delete($path);
+        }
+
+        if ($disk->exists($path)) {
+            return response()->file($disk->path($path), [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => "inline; filename=\"{$commentarySlug}.pdf\"",
+                'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+                'Pragma' => 'no-cache',
+            ]);
+        }
+
+        GenerateCommentaryPdf::dispatch($entry->id(), $locale, $size);
+
+        return (new View)
+            ->template('commentaries/print-pending')
+            ->layout('layout')
+            ->with(['title' => __('pdf_pending_title'), 'locale' => $locale])
+            ->render();
+    }
+
+    public function downloadLegalDomainPdf($locale, $legalDomainSlug)
+    {
+        $entry = Entry::query()
+            ->where('collection', 'commentaries')
+            ->where('locale', $locale)
+            ->where('slug', $legalDomainSlug)
+            ->first();
+
+        if (! $entry || $entry->blueprint()->handle() !== 'legal_domain') {
+            abort(404);
+        }
+
+        if ($entry['status'] !== 'published' && ! User::current()) {
+            abort(404);
+        }
+
+        $disk = Storage::disk('pdf');
+        $dir = "legal-domain/{$locale}/{$legalDomainSlug}";
+        $manifestPath = "{$dir}/manifest.json";
+
+        if (! $disk->exists($manifestPath)) {
+            GenerateLegalDomainPdf::dispatch($entry->id(), $locale);
+
+            return (new View)
+                ->template('commentaries/print-pending')
+                ->layout('layout')
+                ->with(['title' => __('pdf_pending_title'), 'locale' => $locale])
+                ->render();
+        }
+
+        $files = json_decode($disk->get($manifestPath), true)['files'] ?? [];
+
+        if (count($files) === 0) {
+            GenerateLegalDomainPdf::dispatch($entry->id(), $locale);
+
+            return (new View)
+                ->template('commentaries/print-pending')
+                ->layout('layout')
+                ->with(['title' => __('pdf_pending_title'), 'locale' => $locale])
+                ->render();
+        }
+
+        if (count($files) === 1) {
+            $filePath = $disk->path("{$dir}/{$files[0]}");
+
+            if (! file_exists($filePath)) {
+                abort(404);
+            }
+
+            return response()->file($filePath, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => "inline; filename=\"{$files[0]}\"",
+                'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+                'Pragma' => 'no-cache',
+            ]);
+        }
+
+        return response()->stream(function () use ($disk, $dir, $files, $legalDomainSlug) {
+            $zip = new ZipStream(
+                outputName: "{$legalDomainSlug}.zip",
+                sendHttpHeaders: false,
+            );
+
+            foreach ($files as $filename) {
+                $zip->addFileFromPath($filename, $disk->path("{$dir}/{$filename}"));
+            }
+
+            $zip->finish();
+        }, 200, [
+            'Content-Type' => 'application/zip',
+            'Content-Disposition' => "attachment; filename=\"{$legalDomainSlug}.zip\"",
+            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+            'Pragma' => 'no-cache',
+        ]);
+    }
+
+    public function downloadPreview(Request $request, $locale, $commentarySlug)
+    {
+        abort_unless(app()->environment('local'), 404);
+
+        $entry = Entry::query()
+            ->where('collection', 'commentaries')
+            ->where('locale', $locale)
+            ->where('slug', $commentarySlug)
+            ->first();
 
         if (! $entry) {
             abort(404);
@@ -403,22 +535,8 @@ class CommentariesController extends Controller
             abort(404);
         }
 
-        // return (new Converter)->entryToHtml($entry, [
-        //     'text' => $request->text ?? 'md',
-        // ]);
-
-        $file = (new Converter)->entryToHtmlPdf($entry, [
+        return (new Converter)->entryToHtml($entry, [
             'text' => $request->text ?? 'md',
         ]);
-
-        if (config('app.env') !== 'local') {
-            Cache::put($cacheKey, $file, now()->addDays(7));
-        }
-
-        return response()
-            ->file($file, [
-                'Content-Type' => 'application/pdf',
-                'Content-Disposition' => 'inline; filename="'.$commentarySlug.'.pdf"',
-            ]);
     }
 }
