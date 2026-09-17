@@ -97,6 +97,12 @@
           </NavLink>
 
           <NavLink
+            :href="'/' + locale + '/mcp'"
+            :active="false">
+            {{ $t('mcp') }}
+          </NavLink>
+
+          <NavLink
             :href="'/' + locale + '/disclaimer'"
             :active="false">
             {{ $t('disclaimer') }}
