@@ -53,6 +53,8 @@ Route::get('{locale}/kommentare/{commentarySlug}/versions/{versionTimestamp}', [
 Route::get('{locale}/kommentare/{commentarySlug}', [CommentariesController::class, 'show']);
 // commentary print view
 Route::get('{locale}/kommentare/{commentarySlug}/print', [CommentariesController::class, 'print'])->name('commentaries.print');
+// commentary and legal domain PDF generation status, polled by the pending page
+Route::get('{locale}/kommentare/{commentarySlug}/print-status', [CommentariesController::class, 'printStatus']);
 // commentary print HTML preview (used to debug the PDF source markup)
 Route::get('{locale}/kommentare/{commentarySlug}/print-preview', [CommentariesController::class, 'downloadPreview']);
 // commentary revision comparison (previously published version – revision timestamp selected)

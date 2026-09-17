@@ -15,6 +15,7 @@ import AppFooter from '@/components/Layouts/AppFooter.vue'
 import Commentaries from '@/components/Pages/Commentaries.vue'
 import Commentary from '@/components/Pages/Commentary.vue'
 import Footnote from '@/components/Pages/Partials/Footnote.vue'
+import PdfPending from '@/components/Pages/PdfPending.vue'
 import Authors from '@/components/Pages/Authors.vue'
 import Editors from '@/components/Pages/Editors.vue'
 import User from '@/components/Pages/User.vue'
@@ -29,6 +30,7 @@ const app = createApp({
     'commentaries': Commentaries,
     'commentary': Commentary,
     'footnote': Footnote,
+    'pdf-pending': PdfPending,
     'authors': Authors,
     'editors': Editors,
     'user': User,

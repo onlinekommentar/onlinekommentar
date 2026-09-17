@@ -152,7 +152,9 @@
   "volume": "Band",
   "full_table_of_contents": "Inhaltsverzeichnis",
   "pdf_pending_title": "PDF wird erstellt",
-  "pdf_pending_message": "Das PDF wird gerade erstellt. Bitte versuchen Sie es in ein paar Minuten erneut.",
+  "pdf_pending_message": "Das PDF wird erstellt. Diese Seite öffnet es automatisch, sobald es bereit ist.",
+  "pdf_pending_timeout_message": "Die Erstellung des PDFs dauert länger als erwartet.",
+  "pdf_pending_retry": "Erneut prüfen",
 
   "print_commentary": "Kommentar drucken",
   "print": "Drucken",

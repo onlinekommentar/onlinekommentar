@@ -434,11 +434,65 @@ class CommentariesController extends Controller
 
         GenerateCommentaryPdf::dispatch($entry->id(), $locale, $size);
 
-        return (new View)
+        return $this->pdfPending(
+            $locale,
+            "/{$locale}/kommentare/{$commentarySlug}/print-status?text={$size}",
+            3,
+            120,
+        );
+    }
+
+    public function printStatus(Request $request, $locale, $commentarySlug)
+    {
+        $entry = Entry::query()
+            ->where('collection', 'commentaries')
+            ->where('locale', $locale)
+            ->where('slug', $commentarySlug)
+            ->first();
+
+        if (! $entry) {
+            abort(404);
+        }
+
+        if ($entry['status'] !== 'published' && ! User::current()) {
+            abort(404);
+        }
+
+        $disk = Storage::disk('pdf');
+
+        if ($entry->blueprint()->handle() === 'legal_domain') {
+            $manifestPath = "legal-domain/{$locale}/{$commentarySlug}/manifest.json";
+
+            return response()->json([
+                'ready' => $disk->exists($manifestPath)
+                    && count(json_decode($disk->get($manifestPath), true)['files'] ?? []) > 0,
+            ]);
+        }
+
+        $size = in_array($request->text, ['md', 'lg']) ? $request->text : 'md';
+        $path = "commentary/{$locale}/{$size}/{$commentarySlug}.pdf";
+
+        return response()->json([
+            'ready' => $disk->exists($path)
+                && $disk->lastModified($path) >= $entry->lastModified()->getTimestamp(),
+        ]);
+    }
+
+    protected function pdfPending($locale, $statusUrl, $interval, $timeout)
+    {
+        return response((new View)
             ->template('commentaries/print-pending')
             ->layout('layout')
-            ->with(['title' => __('pdf_pending_title'), 'locale' => $locale])
-            ->render();
+            ->with([
+                'title' => __('pdf_pending_title'),
+                'locale' => $locale,
+                'status_url' => $statusUrl,
+                'poll_interval' => $interval,
+                'poll_timeout' => $timeout,
+            ])
+            ->render())
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+            ->header('Pragma', 'no-cache');
     }
 
     public function downloadLegalDomainPdf($locale, $legalDomainSlug)
@@ -464,11 +518,12 @@ class CommentariesController extends Controller
         if (! $disk->exists($manifestPath)) {
             GenerateLegalDomainPdf::dispatch($entry->id(), $locale);
 
-            return (new View)
-                ->template('commentaries/print-pending')
-                ->layout('layout')
-                ->with(['title' => __('pdf_pending_title'), 'locale' => $locale])
-                ->render();
+            return $this->pdfPending(
+                $locale,
+                "/{$locale}/kommentare/{$legalDomainSlug}/print-status",
+                10,
+                600,
+            );
         }
 
         $files = json_decode($disk->get($manifestPath), true)['files'] ?? [];
@@ -476,11 +531,12 @@ class CommentariesController extends Controller
         if (count($files) === 0) {
             GenerateLegalDomainPdf::dispatch($entry->id(), $locale);
 
-            return (new View)
-                ->template('commentaries/print-pending')
-                ->layout('layout')
-                ->with(['title' => __('pdf_pending_title'), 'locale' => $locale])
-                ->render();
+            return $this->pdfPending(
+                $locale,
+                "/{$locale}/kommentare/{$legalDomainSlug}/print-status",
+                10,
+                600,
+            );
         }
 
         if (count($files) === 1) {

@@ -151,7 +151,9 @@
   "volume": "Volume",
   "full_table_of_contents": "Indice",
   "pdf_pending_title": "PDF in fase di creazione",
-  "pdf_pending_message": "Il PDF è in fase di creazione. La preghiamo di riprovare tra qualche minuto.",
+  "pdf_pending_message": "Il PDF è in fase di creazione. Questa pagina lo aprirà automaticamente non appena sarà pronto.",
+  "pdf_pending_timeout_message": "La creazione del PDF sta richiedendo più tempo del previsto.",
+  "pdf_pending_retry": "Controlla di nuovo",
 
   "footnotes": "Note a piè di pagina",
 

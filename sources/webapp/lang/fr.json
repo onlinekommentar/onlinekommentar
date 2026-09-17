@@ -151,7 +151,9 @@
     "volume": "Volume",
     "full_table_of_contents": "Table des matières",
     "pdf_pending_title": "PDF en cours de création",
-    "pdf_pending_message": "Le PDF est en cours de création. Veuillez réessayer dans quelques minutes.",
+    "pdf_pending_message": "Le PDF est en cours de création. Cette page l'ouvrira automatiquement dès qu'il sera prêt.",
+    "pdf_pending_timeout_message": "La création du PDF prend plus de temps que prévu.",
+    "pdf_pending_retry": "Vérifier à nouveau",
 
     "footnotes": "Notes de bas de page",
 
